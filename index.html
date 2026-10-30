@@ -74,6 +74,8 @@ h2{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:10px;display:
 .ev .w small{display:block;font-weight:400;color:var(--muted);font-size:.8em}
 .day.today h3{font-size:1.2em}
 .day.today .ev{font-size:1.35em}
+.signin.small{padding:6px 12px;font-size:13px;margin:0 0 10px}
+#calstatus .msg{padding:0 0 8px}
 .signin{background:var(--text);color:var(--bg);border:0;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;margin-top:4px}
 
 dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:20px;width:min(92vw,480px);margin:auto;max-height:92vh;overflow:auto}
@@ -161,6 +163,7 @@ window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reas
   <button class="count empty" id="count" type="button"></button>
   <section class="cal" aria-labelledby="calh">
     <h2 id="calh">Kalender</h2>
+    <div id="calstatus"></div>
     <div id="calbox"></div>
   </section>
 </div>
@@ -372,12 +375,20 @@ async function renderWeather(){
 /* ---------- Kalender (Google Calendar API, privat via inloggning) ---------- */
 const SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 let tokenClient = null, token = store.get("gtoken", null);
-const tokenOk = () => token && token.exp > Date.now() + 60000;
+const tokenValid = () => token && token.exp > Date.now() + 30000;
+const tokenSoon = () => !token || token.exp < Date.now() + 12*60000;
+const hasAgenda = () => !!$("calbox").querySelector(".agenda");
 
 function calMsg(html){ $("calbox").innerHTML = html; }
 function signInBtn(text){
   calMsg(`<p class="msg">${text}</p><button class="signin" id="signin" type="button">Logga in med Google</button>`);
   $("signin").onclick = () => requestToken("select_account");
+}
+function needLogin(text){
+  if(hasAgenda()){
+    $("calstatus").innerHTML = '<button class="signin small" id="renew" type="button">Inloggningen har gått ut – tryck för att förnya</button>';
+    $("renew").onclick = () => requestToken("select_account");
+  } else signInBtn(text);
 }
 function requestToken(prompt){
   if(!window.google || !google.accounts){ setTimeout(() => requestToken(prompt), 400); return; }
@@ -386,13 +397,14 @@ function requestToken(prompt){
       client_id: cfg.clientId.trim(),
       scope: SCOPE,
       callback: r => {
-        if(r.error){ signInBtn("Inloggningen avbröts eller misslyckades. Försök igen."); return; }
+        if(r.error){ if(!tokenValid()) needLogin("Inloggningen avbröts eller misslyckades. Försök igen."); return; }
         token = {v: r.access_token, exp: Date.now() + (r.expires_in || 3600) * 1000};
         store.set("gtoken", token);
         store.set("signedIn", true);
+        $("calstatus").innerHTML = "";
         loadEvents();
       },
-      error_callback: () => signInBtn("Kunde inte logga in. Tillåt popup-fönster för sidan och försök igen.")
+      error_callback: () => { if(!tokenValid()) needLogin("Kunde inte logga in. Tillåt popup-fönster för sidan och försök igen."); }
     });
   }
   tokenClient.requestAccessToken({prompt});
@@ -401,12 +413,16 @@ async function renderCalendar(){
   if(!cfg.clientId.trim() || !cfg.calIds.trim()){
     calMsg('<p class="msg">Lägg till Client ID och kalender-ID under ⚙ Inställningar.</p>'); return;
   }
-  if(tokenOk()){ loadEvents(); return; }
-  if(store.get("signedIn", false)){ calMsg('<p class="msg">Förnyar inloggning…</p>'); requestToken(""); }
-  else signInBtn("Logga in för att se din kalender.");
+  if(tokenValid()) loadEvents();
+  if(tokenSoon()){
+    if(store.get("signedIn", false)){
+      if(!tokenValid() && !hasAgenda()) calMsg('<p class="msg">Förnyar inloggning…</p>');
+      requestToken("");
+    } else if(!tokenValid()) signInBtn("Logga in för att se din kalender.");
+  }
 }
 async function loadEvents(){
-  calMsg('<p class="msg">Hämtar händelser…</p>');
+  if(!hasAgenda()) calMsg('<p class="msg">Hämtar händelser…</p>');
   const ids = cfg.calIds.split(",").map(x => x.trim()).filter(Boolean);
   const from = new Date(); from.setHours(0,0,0,0);
   const to = new Date(from); to.setDate(to.getDate() + 7);
@@ -418,6 +434,7 @@ async function loadEvents(){
       if(!r.ok) throw new Error(id + ": " + r.status);
       return (await r.json()).items || [];
     }));
+    $("calstatus").innerHTML = "";
     const evs = lists.reduce((a,b) => a.concat(b), []).map(e => {
       const allDay = !!e.start.date;
       const st = allDay ? new Date(e.start.date + "T00:00:00") : new Date(e.start.dateTime);
@@ -445,6 +462,7 @@ async function loadEvents(){
     }).join("") + "</div>");
   } catch(err){
     if(err === "auth") { renderCalendar(); return; }
+    if(hasAgenda()){ $("calstatus").innerHTML = '<p class="msg">Kunde inte uppdatera kalendern just nu.</p>'; return; }
     calMsg(`<p class="msg">Kunde inte hämta kalendern (${esc(String(err.message || err))}). Kontrollera kalender-ID och att Google Calendar API är aktiverat i ditt Cloud-projekt.</p>`);
   }
 }
@@ -499,7 +517,9 @@ function applySchedule(){
   setWake(day);
 }
 $("night").onclick = () => { peekUntil = Date.now() + 60000; applySchedule(); };
-document.addEventListener("visibilitychange", applySchedule);
+function refreshAll(){ renderPrices(); renderWeather(); renderCalendar(); }
+document.addEventListener("visibilitychange", () => { applySchedule(); if(document.visibilityState === "visible") refreshAll(); });
+window.addEventListener("online", refreshAll);
 
 /* ---------- Fullskärm / PWA ---------- */
 const isApp = matchMedia("(display-mode: fullscreen), (display-mode: standalone)").matches;
@@ -514,7 +534,7 @@ tick(); setInterval(tick, 15000);
 renderPrices(); renderWeather(); renderCalendar();
 setInterval(renderPrices, 15*60*1000);
 setInterval(renderWeather, 30*60*1000);
-setInterval(renderCalendar, 10*60*1000);
+setInterval(renderCalendar, 5*60*1000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
