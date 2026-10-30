@@ -255,7 +255,8 @@ function tick(){
   const nl = document.querySelector(".nowline"); if(nl) nl.style.left = nowPct() + "%";
   if(now.getHours() !== lastHr){ lastHr = now.getHours(); renderPrices(); renderWeather(); }
   applySchedule();
-  if(tomorrowMissing && now.getHours() >= 12 && Date.now() - lastPriceTry > 120000) renderPrices();
+  const mins = now.getHours()*60 + now.getMinutes();
+  if(tomorrowMissing && mins >= 12*60+45 && mins < 14*60 && Date.now() - lastPriceTry >= 10*60000) renderPrices();
 }
 
 /* ---------- Nedräkning ---------- */
@@ -313,7 +314,7 @@ async function renderPrices(){
   const res = await Promise.all([settle(loadPrices(0)), settle(loadPrices(1))]);
   tomorrowMissing = !res[1].ok;
   const eb = $("err"), nowMin = new Date().getHours()*60 + new Date().getMinutes();
-  if(tomorrowMissing && nowMin >= 13*60 + 30) showErr("Elpris imorgon kunde inte hämtas (" + ((res[1].e && res[1].e.message) || "okänt fel") + ")");
+  if(tomorrowMissing && nowMin >= 14*60) showErr("Elpris imorgon kunde inte hämtas (" + ((res[1].e && res[1].e.message) || "okänt fel") + ")");
   else if(!tomorrowMissing && eb && eb.textContent.indexOf("Elpris imorgon") > -1) eb.style.display = "none";
   const day = r => r.ok ? r.v.map(v => v === null ? null : ore(v)) : new Array(24).fill(null);
   const series = day(res[0]).concat(day(res[1]));
