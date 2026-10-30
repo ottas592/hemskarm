@@ -514,7 +514,7 @@ tick(); setInterval(tick, 15000);
 renderPrices(); renderWeather(); renderCalendar();
 setInterval(renderPrices, 15*60*1000);
 setInterval(renderWeather, 30*60*1000);
-setInterval(() => { if(cfg.clientId && tokenOk()) loadEvents(); }, 10*60*1000);
+setInterval(renderCalendar, 10*60*1000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
