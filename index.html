@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14202B">
+<title>Hemskärm</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap">
+<style>
+:root{
+  --bg:#14202B; --panel:#1D2D3B; --line:#2C4154; --text:#E9EEF1; --muted:#8FA3B3;
+  --cheap:#5FB3A1; --mid:#F2B84B; --high:#E5765F; --accent:#F2B84B;
+  --font:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font)}
+body{padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));max-width:560px;margin:0 auto}
+button,input{font:inherit;color:inherit}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.weekday{font-size:15px;color:var(--muted);font-weight:400}
+.date{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.clock{font-size:34px;font-weight:300;font-variant-numeric:tabular-nums;text-align:right;line-height:1.05}
+.week{font-size:13px;color:var(--muted);text-align:right}
+.gear{background:none;border:1px solid var(--line);border-radius:10px;width:40px;height:40px;cursor:pointer;color:var(--muted);flex:none}
+.gear:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.count{margin-top:18px;background:var(--accent);color:#1A1405;border-radius:20px;padding:18px 20px;display:flex;align-items:baseline;gap:14px;cursor:pointer;border:0;width:100%;text-align:left}
+.count .n{font-size:64px;font-weight:800;letter-spacing:-.04em;line-height:.9;font-variant-numeric:tabular-nums}
+.count .l{font-size:17px;font-weight:600;line-height:1.2}
+.count .l small{display:block;font-weight:400;opacity:.7;font-size:13px;margin-top:2px}
+.count.empty{background:var(--panel);color:var(--muted);border:1px dashed var(--line)}
+.count.empty .l{font-weight:400}
+
+section{margin-top:16px;background:var(--panel);border-radius:20px;padding:18px 16px}
+h2{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{background:none;border:0;padding:5px 12px;font-size:13px;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--text);color:var(--bg)}
+
+.now{display:flex;align-items:baseline;gap:8px}
+.now .p{font-size:52px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.now .u{font-size:15px;color:var(--muted)}
+.now .tag{margin-left:auto;font-size:13px;padding:3px 10px;border-radius:999px;background:var(--bg)}
+.stats{display:flex;gap:18px;margin:8px 0 14px;font-size:13px;color:var(--muted)}
+.stats b{color:var(--text);font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:2px;height:110px}
+.bar{flex:1;border-radius:3px 3px 0 0;min-height:3px;background:var(--mid);opacity:.55}
+.bar.cur{opacity:1;outline:2px solid var(--text);outline-offset:1px}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+.msg{font-size:14px;color:var(--muted);padding:12px 0}
+
+.day{margin-top:14px}
+.day:first-child{margin-top:0}
+.day h3{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:6px;text-transform:none}
+.ev{display:flex;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:15px;line-height:1.3}
+.ev .t{width:92px;flex:none;color:var(--muted);font-variant-numeric:tabular-nums;font-size:14px}
+.ev .w{font-weight:600}
+.ev .w small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.signin{background:var(--text);color:var(--bg);border:0;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;margin-top:4px}
+
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:20px;width:min(92vw,480px);margin:auto}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+label{display:block;font-size:14px;color:var(--muted);margin:14px 0 6px}
+input[type=text],input[type=date]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color-scheme:dark}
+.row{display:flex;gap:10px;align-items:center;margin-top:14px;font-size:15px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.btn{border-radius:10px;padding:10px 18px;border:1px solid var(--line);background:none;cursor:pointer}
+.btn.primary{background:var(--accent);color:#1A1405;border-color:var(--accent);font-weight:600}
+
+/* Surfplatta / liggande skärm (t.ex. 1024 x 768): två kolumner utan scroll */
+@media (min-width:900px){
+  body{max-width:none;margin:0;height:100vh;height:100dvh;overflow:hidden;display:grid;
+    grid-template-columns:1fr 1.15fr;grid-template-rows:auto auto 1fr;
+    grid-template-areas:"top top" "count cal" "price cal";gap:16px;padding:20px 28px}
+  .top{grid-area:top;align-items:center}
+  .weekday{font-size:20px}
+  .date,.clock{font-size:56px}
+  .week{font-size:15px}
+  .count{grid-area:count;margin:0;padding:22px 26px}
+  .count .n{font-size:88px}
+  .count .l{font-size:20px}
+  section{margin:0;min-height:0;padding:20px 20px}
+  section.pricebox{grid-area:price;display:flex;flex-direction:column}
+  #price{flex:1;display:flex;flex-direction:column;min-height:0}
+  .bars{flex:1;height:auto;min-height:100px}
+  .now .p{font-size:68px}
+  .stats{font-size:15px}
+  h2{font-size:17px}
+  section.cal{grid-area:cal;overflow-y:auto}
+  .day h3{font-size:17px}
+  .ev{font-size:18px;padding:10px 0}
+  .ev .t{width:110px;font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <div class="weekday" id="weekday"></div>
+    <div class="date" id="date"></div>
+  </div>
+  <div>
+    <div class="clock" id="clock"></div>
+    <div class="week" id="week"></div>
+  </div>
+  <button class="gear" id="openSettings" aria-label="Inställningar">⚙</button>
+</header>
+
+<button class="count empty" id="count" type="button"></button>
+
+<section class="pricebox" aria-labelledby="elh">
+  <h2 id="elh">Elpris SE3
+    <span class="seg" role="group" aria-label="Dag">
+      <button type="button" id="dToday" aria-pressed="true">Idag</button>
+      <button type="button" id="dTomorrow" aria-pressed="false">Imorgon</button>
+    </span>
+  </h2>
+  <div id="price"></div>
+</section>
+
+<section class="cal" aria-labelledby="calh">
+  <h2 id="calh">Kalender</h2>
+  <div id="calbox"></div>
+</section>
+
+<dialog id="settings">
+  <h2 style="font-size:20px;color:var(--text)">Inställningar</h2>
+
+  <label for="cdLabel">Nedräkning: namn</label>
+  <input type="text" id="cdLabel" placeholder="t.ex. Semester">
+  <label for="cdDate">Nedräkning: datum</label>
+  <input type="date" id="cdDate">
+
+  <label for="clientId">Google Client ID</label>
+  <input type="text" id="clientId" placeholder="123456-abc.apps.googleusercontent.com">
+  <label for="calIds">Kalender-ID (flera separeras med komma)</label>
+  <input type="text" id="calIds" placeholder="xxxx@group.calendar.google.com">
+  <p class="hint">Client ID skapas i Google Cloud (se instruktionerna). Kalender-ID hittar du i kalenderns inställningar under ”Integrera kalender”. Skriv primary för din egen huvudkalender.</p>
+
+  <div class="row">
+    <input type="checkbox" id="vat"> <label for="vat" style="margin:0;color:var(--text)">Visa pris inklusive moms (25 %)</label>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="cancel" type="button">Avbryt</button>
+    <button class="btn primary" id="save" type="button">Spara</button>
+  </div>
+</dialog>
+
+<script>
+const $ = id => document.getElementById(id);
+const TZ = "Europe/Stockholm";
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+const cfg = {
+  cdLabel: store.get("cdLabel", ""),
+  cdDate:  store.get("cdDate", ""),
+  clientId: store.get("clientId", ""),
+  calIds:  store.get("calIds", ""),
+  vat:     store.get("vat", false)
+};
+
+/* ---------- Datum, klocka, veckonummer ---------- */
+function isoWeek(d){
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - day);
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return Math.ceil(((t - y0) / 864e5 + 1) / 7);
+}
+function tick(){
+  const now = new Date();
+  $("weekday").textContent = now.toLocaleDateString("sv-SE", {weekday:"long", timeZone:TZ});
+  $("date").textContent = now.toLocaleDateString("sv-SE", {day:"numeric", month:"long", timeZone:TZ});
+  $("clock").textContent = now.toLocaleTimeString("sv-SE", {hour:"2-digit", minute:"2-digit", timeZone:TZ});
+  $("week").textContent = "vecka " + isoWeek(now);
+  renderCountdown();
+}
+
+/* ---------- Nedräkning ---------- */
+function renderCountdown(){
+  const el = $("count");
+  if(!cfg.cdDate){
+    el.className = "count empty";
+    el.innerHTML = '<span class="l">Ställ in en nedräkning<small>Tryck här</small></span>';
+    return;
+  }
+  const [y,m,d] = cfg.cdDate.split("-").map(Number);
+  const target = new Date(y, m-1, d);
+  const n = new Date(); const today = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+  const days = Math.round((target - today) / 864e5);
+  const dateTxt = target.toLocaleDateString("sv-SE", {day:"numeric", month:"long", year:"numeric"});
+  el.className = "count";
+  let big, txt;
+  if(days > 0){ big = days; txt = (days === 1 ? "dag kvar" : "dagar kvar"); }
+  else if(days === 0){ big = "Idag!"; txt = ""; }
+  else { big = Math.abs(days); txt = (Math.abs(days) === 1 ? "dag sedan" : "dagar sedan"); }
+  el.innerHTML = `<span class="n">${big}</span><span class="l">${txt}${cfg.cdLabel ? " till " + esc(cfg.cdLabel) : ""}<small>${dateTxt}</small></span>`;
+}
+function esc(s){ return s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* ---------- Elpris SE3 (elprisetjustnu.se) ---------- */
+let showDay = "today";
+const cache = {};
+function dayUrl(offset){
+  const d = new Date(); d.setDate(d.getDate() + offset);
+  const p = x => String(x).padStart(2,"0");
+  return `https://www.elprisetjustnu.se/api/v1/prices/${d.getFullYear()}/${p(d.getMonth()+1)}-${p(d.getDate())}_SE3.json`;
+}
+async function loadPrices(offset){
+  const url = dayUrl(offset);
+  if(cache[url] && Date.now() - cache[url].t < 15*60*1000) return cache[url].v;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error(r.status);
+  const raw = await r.json();
+  const hours = Array.from({length:24}, () => []);
+  raw.forEach(x => hours[new Date(x.time_start).getHours()].push(x.SEK_per_kWh));
+  const v = hours.map(a => a.length ? a.reduce((s,n)=>s+n,0)/a.length : null);
+  cache[url] = {t:Date.now(), v};
+  return v;
+}
+const ore = sek => sek * 100 * (cfg.vat ? 1.25 : 1);
+const fmt = n => n.toLocaleString("sv-SE", {maximumFractionDigits:0});
+
+async function renderPrices(){
+  const box = $("price");
+  const offset = showDay === "today" ? 0 : 1;
+  box.innerHTML = '<p class="msg">Hämtar priser…</p>';
+  let h;
+  try { h = await loadPrices(offset); }
+  catch(e){
+    box.innerHTML = '<p class="msg">' + (offset === 1
+      ? "Morgondagens priser publiceras vanligtvis runt kl. 13."
+      : "Kunde inte hämta priser. Kontrollera internetanslutningen och att sidan öppnas i en vanlig webbläsare.") + '</p>';
+    return;
+  }
+  const vals = h.map(v => v === null ? null : ore(v));
+  const ok = vals.filter(v => v !== null);
+  if(!ok.length){ box.innerHTML = '<p class="msg">Inga priser tillgängliga.</p>'; return; }
+  const min = Math.min(...ok), max = Math.max(...ok), avg = ok.reduce((s,n)=>s+n,0)/ok.length;
+  const hr = new Date().getHours();
+  const curIdx = offset === 0 ? hr : -1;
+  const sorted = [...ok].sort((a,b)=>a-b);
+  const lo = sorted[Math.floor(sorted.length/3)], hi = sorted[Math.floor(sorted.length*2/3)];
+  const col = v => v <= lo ? "var(--cheap)" : v >= hi ? "var(--high)" : "var(--mid)";
+
+  let top = "";
+  if(curIdx >= 0 && vals[curIdx] !== null){
+    const c = vals[curIdx];
+    const label = c <= lo ? "Billigt" : c >= hi ? "Dyrt" : "Normalt";
+    top = `<div class="now"><span class="p" style="color:${col(c)}">${fmt(c)}</span><span class="u">öre/kWh just nu</span><span class="tag" style="color:${col(c)}">${label}</span></div>`;
+  } else {
+    top = `<div class="now"><span class="p">${fmt(avg)}</span><span class="u">öre/kWh i snitt</span></div>`;
+  }
+  const minH = vals.indexOf(min), maxH = vals.indexOf(max);
+  const hh = i => String(i).padStart(2,"0") + ":00";
+  const stats = `<div class="stats"><span>Lägst <b>${fmt(min)}</b> kl. ${hh(minH)}</span><span>Högst <b>${fmt(max)}</b> kl. ${hh(maxH)}</span><span>Snitt <b>${fmt(avg)}</b></span></div>`;
+  const bars = vals.map((v,i) => v === null ? '<div class="bar" style="height:3px;opacity:.2"></div>'
+    : `<div class="bar${i===curIdx?" cur":""}" title="${hh(i)}: ${fmt(v)} öre" style="height:${Math.max(3, v/max*100)}%;background:${col(v)}"></div>`).join("");
+  box.innerHTML = top + stats + `<div class="bars">${bars}</div><div class="axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>`
+    + `<p class="hint">${cfg.vat ? "Inklusive" : "Exklusive"} moms. Källa: elprisetjustnu.se</p>`;
+}
+function setDay(d){
+  showDay = d;
+  $("dToday").setAttribute("aria-pressed", d === "today");
+  $("dTomorrow").setAttribute("aria-pressed", d === "tomorrow");
+  renderPrices();
+}
+$("dToday").onclick = () => setDay("today");
+$("dTomorrow").onclick = () => setDay("tomorrow");
+
+/* ---------- Kalender (Google Calendar API, privat via inloggning) ---------- */
+const SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
+let tokenClient = null, token = store.get("gtoken", null);
+const tokenOk = () => token && token.exp > Date.now() + 60000;
+
+function calMsg(html){ $("calbox").innerHTML = html; }
+function signInBtn(text){
+  calMsg(`<p class="msg">${text}</p><button class="signin" id="signin" type="button">Logga in med Google</button>`);
+  $("signin").onclick = () => requestToken("select_account");
+}
+function requestToken(prompt){
+  if(!window.google || !google.accounts){ setTimeout(() => requestToken(prompt), 400); return; }
+  if(!tokenClient){
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: cfg.clientId.trim(),
+      scope: SCOPE,
+      callback: r => {
+        if(r.error){ signInBtn("Inloggningen avbröts eller misslyckades. Försök igen."); return; }
+        token = {v: r.access_token, exp: Date.now() + (r.expires_in || 3600) * 1000};
+        store.set("gtoken", token);
+        store.set("signedIn", true);
+        loadEvents();
+      },
+      error_callback: () => signInBtn("Kunde inte logga in. Tillåt popup-fönster för sidan och försök igen.")
+    });
+  }
+  tokenClient.requestAccessToken({prompt});
+}
+async function renderCalendar(){
+  if(!cfg.clientId.trim() || !cfg.calIds.trim()){
+    calMsg('<p class="msg">Lägg till Client ID och kalender-ID under ⚙ Inställningar.</p>'); return;
+  }
+  if(tokenOk()){ loadEvents(); return; }
+  if(store.get("signedIn", false)){ calMsg('<p class="msg">Förnyar inloggning…</p>'); requestToken(""); }
+  else signInBtn("Logga in för att se din kalender.");
+}
+async function loadEvents(){
+  calMsg('<p class="msg">Hämtar händelser…</p>');
+  const ids = cfg.calIds.split(",").map(x => x.trim()).filter(Boolean);
+  const from = new Date(); from.setHours(0,0,0,0);
+  const to = new Date(from); to.setDate(to.getDate() + 7);
+  try {
+    const lists = await Promise.all(ids.map(async id => {
+      const u = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(id)}/events?singleEvents=true&orderBy=startTime&maxResults=50&timeMin=${from.toISOString()}&timeMax=${to.toISOString()}`;
+      const r = await fetch(u, {headers:{Authorization:"Bearer " + token.v}});
+      if(r.status === 401){ token = null; store.set("gtoken", null); throw "auth"; }
+      if(!r.ok) throw new Error(id + ": " + r.status);
+      return (await r.json()).items || [];
+    }));
+    const evs = lists.flat().map(e => {
+      const allDay = !!e.start.date;
+      const st = allDay ? new Date(e.start.date + "T00:00:00") : new Date(e.start.dateTime);
+      const en = allDay ? new Date(e.end.date + "T00:00:00") : new Date(e.end.dateTime);
+      return {t:e.summary || "(utan titel)", loc:e.location || "", allDay, st, en};
+    });
+    // dela upp heldagshändelser som sträcker sig över flera dagar
+    const byDay = {};
+    for(let i = 0; i < 7; i++){
+      const d0 = new Date(from); d0.setDate(d0.getDate() + i);
+      const d1 = new Date(d0); d1.setDate(d1.getDate() + 1);
+      const list = evs.filter(e => e.st < d1 && e.en > d0 && !(e.en <= d0))
+        .sort((a,b) => (b.allDay - a.allDay) || (a.st - b.st));
+      if(list.length) byDay[i] = {d0, list};
+    }
+    const keys = Object.keys(byDay);
+    if(!keys.length){ calMsg('<p class="msg">Inga händelser de närmaste 7 dagarna.</p>'); return; }
+    const hm = d => d.toLocaleTimeString("sv-SE", {hour:"2-digit", minute:"2-digit"});
+    calMsg(keys.map(k => {
+      const {d0, list} = byDay[k];
+      const title = k === "0" ? "Idag" : k === "1" ? "Imorgon" : d0.toLocaleDateString("sv-SE", {weekday:"long", day:"numeric", month:"long"});
+      return `<div class="day"><h3>${title}</h3>` + list.map(e =>
+        `<div class="ev"><span class="t">${e.allDay ? "Heldag" : hm(e.st) + "–" + hm(e.en)}</span><span class="w">${esc(e.t)}${e.loc ? "<small>" + esc(e.loc) + "</small>" : ""}</span></div>`
+      ).join("") + "</div>";
+    }).join(""));
+  } catch(err){
+    if(err === "auth") { renderCalendar(); return; }
+    calMsg(`<p class="msg">Kunde inte hämta kalendern (${esc(String(err.message || err))}). Kontrollera kalender-ID och att Google Calendar API är aktiverat i ditt Cloud-projekt.</p>`);
+  }
+}
+
+/* ---------- Inställningar ---------- */
+const dlg = $("settings");
+$("openSettings").onclick = openSettings;
+$("count").onclick = openSettings;
+function openSettings(){
+  $("cdLabel").value = cfg.cdLabel; $("cdDate").value = cfg.cdDate;
+  $("clientId").value = cfg.clientId; $("calIds").value = cfg.calIds; $("vat").checked = cfg.vat;
+  dlg.showModal();
+}
+$("cancel").onclick = () => dlg.close();
+$("save").onclick = () => {
+  cfg.cdLabel = $("cdLabel").value.trim(); cfg.cdDate = $("cdDate").value;
+  cfg.clientId = $("clientId").value.trim(); cfg.calIds = $("calIds").value.trim(); tokenClient = null; cfg.vat = $("vat").checked;
+  Object.keys(cfg).forEach(k => store.set(k, cfg[k]));
+  dlg.close(); tick(); renderPrices(); renderCalendar();
+};
+
+/* ---------- Start ---------- */
+tick(); setInterval(tick, 15000);
+renderPrices(); renderCalendar();
+setInterval(renderPrices, 15*60*1000);
+setInterval(() => { if(cfg.clientId && tokenOk()) loadEvents(); }, 10*60*1000);
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</body>
+</html>
