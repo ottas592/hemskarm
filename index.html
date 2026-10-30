@@ -23,17 +23,21 @@ button,input{font:inherit;color:inherit}
 .date{font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
 .clock{font-size:40px;font-weight:300;font-variant-numeric:tabular-nums;text-align:right;line-height:1.05}
 .week{font-size:13px;color:var(--muted);text-align:right}
-.gear{background:none;border:1px solid var(--line);border-radius:10px;width:40px;height:40px;cursor:pointer;color:var(--muted);flex:none}
+.tools{display:flex;align-items:center}
+.gear{background:none;border:0;border-radius:10px;width:40px;height:40px;cursor:pointer;color:#8d9aa6;opacity:.75;flex:none;display:flex;align-items:center;justify-content:center;font-size:22px;padding:0}
+.gear[hidden]{display:none}
+.gear:hover{opacity:1}
 .gear:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.count{margin-top:18px;background:var(--accent);color:#1A1405;border-radius:20px;padding:18px 20px;display:flex;align-items:baseline;gap:14px;cursor:pointer;border:0;width:100%;text-align:left}
-.count .n{font-size:64px;font-weight:800;letter-spacing:-.04em;line-height:.9;font-variant-numeric:tabular-nums}
-.count .l{font-size:17px;font-weight:600;line-height:1.2}
-.count .l small{display:block;font-weight:400;opacity:.7;font-size:13px;margin-top:2px}
+.count{background:var(--accent);color:#1A1405;border-radius:16px;padding:8px 18px;display:flex;align-items:center;cursor:pointer;border:0;width:100%;text-align:left}
+.count>*+*{margin-left:14px}
+.count .n{font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.count .l{font-size:16px;font-weight:600;line-height:1.2}
+.count .l small{display:block;font-weight:400;opacity:.7;font-size:12px;margin-top:1px}
 .count.empty{background:var(--panel);color:var(--muted);border:1px dashed var(--line)}
 .count.empty .l{font-weight:400}
 
-section{margin-top:16px;background:var(--panel);border-radius:20px;padding:18px 16px}
+section{margin-top:0;background:var(--panel);border-radius:20px;padding:18px 16px}
 h2{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
 .seg button{background:none;border:0;padding:5px 12px;font-size:13px;color:var(--muted);cursor:pointer}
@@ -48,13 +52,16 @@ h2{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:10px;display:
 .chart{margin-top:12px}
 .dh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;color:var(--muted);margin-bottom:5px}
 .dh b{color:var(--text);font-size:15px}
-.bars{position:relative;display:flex;height:70px}
+.bars{position:relative;display:flex;height:120px}
 .b{flex:1;display:flex;align-items:flex-end;padding:0 1px}
 .bar{width:100%;border-radius:2px 2px 0 0;min-height:2px;opacity:.9}
 .bar.past{opacity:.4}
 .nowline{position:absolute;top:-5px;bottom:0;width:3px;margin-left:-1.5px;background:var(--text);border-radius:2px;box-shadow:0 0 0 1.5px var(--bg);pointer-events:none}
 .nowline::before{content:"";position:absolute;top:-2px;left:-3px;width:9px;height:9px;border-radius:50%;background:var(--text);box-shadow:0 0 0 1.5px var(--bg)}
-.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+.axis{position:relative;height:18px;margin-top:6px}
+.axis span{position:absolute;top:0;font-size:12px;color:var(--muted)}
+.axis b{color:var(--text);font-weight:600}
+.midnight{position:absolute;top:0;bottom:0;left:50%;border-left:1px dashed var(--line);pointer-events:none}
 .msg{font-size:14px;color:var(--muted);padding:12px 0}
 
 .agenda{font-size:calc(16px*var(--cs,1))}
@@ -79,37 +86,56 @@ input[type=text],input[type=date],input[type=time]{width:100%;background:var(--b
 .btn{border-radius:10px;padding:10px 18px;border:1px solid var(--line);background:none;cursor:pointer}
 .btn.primary{background:var(--accent);color:#1A1405;border-color:var(--accent);font-weight:600}
 
+.col{margin-top:14px}
+.col>*+*{margin-top:14px}
+.now{margin-bottom:10px}
+.wt{display:flex;align-items:center}
+.wt>*+*{margin-left:12px}
+.wi{font-size:48px;line-height:1}
+.wtemp{font-size:54px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.wd b{display:block;font-size:20px}
+.wd span{font-size:14px;color:var(--muted)}
+.wn{display:flex;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.wc{flex:1;display:flex;align-items:center;font-size:14px;min-width:0}
+.wc>*+*{margin-left:8px}
+.wc+.wc{margin-left:12px;padding-left:12px;border-left:1px solid var(--line)}
+.wc .d{font-weight:600;text-transform:capitalize}
+.wc .wi2{font-size:24px;line-height:1}
+.wc small{color:var(--muted);font-size:12px}
+
 /* Surfplatta / liggande skärm (t.ex. 1024 x 768): två kolumner utan scroll */
 @media (min-width:900px){
-  body{max-width:none;margin:0;height:100vh;height:100dvh;overflow:hidden;display:grid;
-    grid-template-columns:1fr 1.15fr;grid-template-rows:auto auto 1fr;
-    grid-template-areas:"top top" "count cal" "price cal";gap:16px;padding:18px 28px}
+  body{max-width:none;margin:0;height:100vh;overflow:hidden;display:grid;
+    grid-template-columns:1fr 1.1fr;grid-template-rows:auto 1fr;
+    grid-template-areas:"top top" "L R";grid-gap:14px 18px;padding:14px 28px}
   .top{grid-area:top;align-items:center}
   .weekday{font-size:26px}
-  .date,.clock{font-size:clamp(56px,7.6vw,100px)}
+  .date,.clock{font-size:7.4vw}
   .week{font-size:22px}
-  .gear{width:48px;height:48px;font-size:20px}
-  .count{grid-area:count;margin:0;padding:20px 26px}
-  .count .n{font-size:88px}
-  .count .l{font-size:20px}
-  section{margin:0;min-height:0;padding:16px 20px}
-  section.pricebox{grid-area:price;display:flex;flex-direction:column}
+  .col{margin:0;display:flex;flex-direction:column;min-height:0}
+  #colL{grid-area:L}
+  #colR{grid-area:R}
+  .count .n{font-size:46px}
+  section{padding:14px 18px;min-height:0}
+  section.pricebox{flex:1;display:flex;flex-direction:column}
   #price{flex:1;display:flex;flex-direction:column;min-height:0}
-  .now .p{font-size:58px}
-  .chart{flex:1;display:flex;flex-direction:column;min-height:0;margin-top:8px}
-  .bars{flex:1;height:auto;min-height:40px}
-  .dh{font-size:13px}
-  .dh b{font-size:17px}
-  .axis{font-size:12px}
-  h2{font-size:17px}
-  section.cal{grid-area:cal;overflow-y:auto}
+  .now .p{font-size:52px}
+  .bars{flex:1;height:auto;min-height:60px}
+  section.cal{flex:1;overflow-y:auto}
   .agenda{font-size:calc(18px*var(--cs,1))}
+  h2{font-size:16px}
 }
-#night{position:fixed;inset:0;background:#000;z-index:200}
+#night{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:200}
 #night[hidden]{display:none}
 </style>
 </head>
 <body>
+<div id="err" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:999;background:#7a1f12;color:#fff;font:14px/1.4 sans-serif;padding:10px 14px"></div>
+<script>
+function showErr(t){var e=document.getElementById("err");if(!e)return;e.style.display="block";e.textContent="Fel: "+t;}
+window.onerror=function(m,u,l){showErr(m+" (rad "+l+")");};
+window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reason&&ev.reason.message||ev.reason));});
+</script>
 
 <header class="top">
   <div>
@@ -120,20 +146,24 @@ input[type=text],input[type=date],input[type=time]{width:100%;background:var(--b
     <div class="clock" id="clock"></div>
     <div class="week" id="week"></div>
   </div>
-  <div style="display:flex;gap:8px"><button class="gear" id="fs" type="button" aria-label="Fullskärm" hidden>⛶</button><button class="gear" id="openSettings" aria-label="Inställningar">⚙</button></div>
+  <div class="tools"><button class="gear" id="fs" type="button" aria-label="Fullskärm" hidden>⛶&#xFE0E;</button><button class="gear" id="openSettings" type="button" aria-label="Inställningar"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button></div>
 </header>
 
-<button class="count empty" id="count" type="button"></button>
+<div class="col" id="colL">
+  <section class="weather" id="weather" aria-label="Väder"></section>
+  <section class="pricebox" aria-labelledby="elh">
+    <h2 id="elh"><span>Elpris SE3</span><span style="font-weight:400;font-size:13px">öre/kWh</span></h2>
+    <div id="price"></div>
+  </section>
+</div>
 
-<section class="pricebox" aria-labelledby="elh">
-  <h2 id="elh"><span>Elpris SE3</span><span style="font-weight:400;font-size:13px">öre/kWh</span></h2>
-  <div id="price"></div>
-</section>
-
-<section class="cal" aria-labelledby="calh">
-  <h2 id="calh">Kalender</h2>
-  <div id="calbox"></div>
-</section>
+<div class="col" id="colR">
+  <button class="count empty" id="count" type="button"></button>
+  <section class="cal" aria-labelledby="calh">
+    <h2 id="calh">Kalender</h2>
+    <div id="calbox"></div>
+  </section>
+</div>
 
 <div id="night" hidden aria-hidden="true"></div>
 
@@ -144,6 +174,9 @@ input[type=text],input[type=date],input[type=time]{width:100%;background:var(--b
   <input type="text" id="cdLabel" placeholder="t.ex. Semester">
   <label for="cdDate">Nedräkning: datum</label>
   <input type="date" id="cdDate">
+
+  <label for="city">Ort för väder</label>
+  <input type="text" id="city" placeholder="Stockholm">
 
   <label for="clientId">Google Client ID</label>
   <input type="text" id="clientId" placeholder="123456-abc.apps.googleusercontent.com">
@@ -191,6 +224,10 @@ const cfg = {
   calIds:  store.get("calIds", ""),
   vat:     store.get("vat", false),
   calScale: store.get("calScale", 100),
+  city:    store.get("city", "Stockholm"),
+  lat:     store.get("lat", 59.3293),
+  lon:     store.get("lon", 18.0686),
+  geoFor:  store.get("geoFor", "Stockholm"),
   schedOn: store.get("schedOn", true),
   onFrom:  store.get("onFrom", "06:00"),
   onTo:    store.get("onTo", "23:00")
@@ -213,7 +250,7 @@ function tick(){
   $("week").textContent = "vecka " + isoWeek(now);
   renderCountdown();
   const nl = document.querySelector(".nowline"); if(nl) nl.style.left = nowPct() + "%";
-  if(now.getHours() !== lastHr){ lastHr = now.getHours(); renderPrices(); }
+  if(now.getHours() !== lastHr){ lastHr = now.getHours(); renderPrices(); renderWeather(); }
   applySchedule();
 }
 
@@ -261,38 +298,75 @@ async function loadPrices(offset){
 const ore = sek => sek * 100 * (cfg.vat ? 1.25 : 1);
 const fmt = n => n.toLocaleString("sv-SE", {maximumFractionDigits:0});
 const hh = i => String(i).padStart(2,"0");
-const nowPct = () => { const n = new Date(); return ((n.getHours() + n.getMinutes()/60) / 24 * 100).toFixed(2); };
+const nowPct = () => { const n = new Date(); return ((n.getHours() + n.getMinutes()/60) / 48 * 100).toFixed(2); };
 
 async function renderPrices(){
   const box = $("price");
   if(!box.children.length) box.innerHTML = '<p class="msg">Hämtar priser…</p>';
-  const res = await Promise.allSettled([loadPrices(0), loadPrices(1)]);
-  const vs = res.map(r => r.status === "fulfilled" ? r.value.map(v => v === null ? null : ore(v)) : null);
-  const all = vs.filter(Boolean).flat().filter(v => v !== null);
-  if(!all.length){ box.innerHTML = '<p class="msg">Kunde inte hämta priser. Kontrollera internetanslutningen.</p>'; return; }
+  const settle = p => p.then(v => ({ok:true, v}), () => ({ok:false}));
+  const res = await Promise.all([settle(loadPrices(0)), settle(loadPrices(1))]);
+  const day = r => r.ok ? r.v.map(v => v === null ? null : ore(v)) : new Array(24).fill(null);
+  const series = day(res[0]).concat(day(res[1]));
+  const all = series.filter(v => v !== null);
+  if(!all.length){ box.innerHTML = '<p class="msg">Kunde inte hämta priser.</p>'; return; }
   const gmax = Math.max(...all);
   const sorted = [...all].sort((a,b) => a-b);
   const lo = sorted[Math.floor(sorted.length/3)], hi = sorted[Math.floor(sorted.length*2/3)];
   const col = v => v <= lo ? "var(--cheap)" : v >= hi ? "var(--high)" : "var(--mid)";
   const hr = new Date().getHours();
-  const c = vs[0] ? vs[0][hr] : null;
+  const c = series[hr];
   let head = "";
-  if(c !== null && c !== undefined){
+  if(c !== null){
     const label = c <= lo ? "Billigt" : c >= hi ? "Dyrt" : "Normalt";
     head = `<div class="now"><span class="p" style="color:${col(c)}">${fmt(c)}</span><span class="u">öre/kWh just nu</span><span class="tag" style="color:${col(c)}">${label}</span></div>`;
   }
-  const chart = (name, v, isToday) => {
-    if(!v) return `<div class="chart"><div class="dh"><b>${name}</b></div><p class="msg">Publiceras vanligtvis runt kl. 13.</p></div>`;
-    const ok = v.filter(x => x !== null);
-    const min = Math.min(...ok), max = Math.max(...ok), avg = ok.reduce((s,n) => s+n, 0) / ok.length;
-    const bars = v.map((x,i) => x === null
-      ? '<div class="b"><div class="bar" style="height:2px;opacity:.2"></div></div>'
-      : `<div class="b" title="${hh(i)}:00 – ${fmt(x)} öre"><div class="bar${isToday && i < hr ? " past" : ""}" style="height:${Math.max(3, x/gmax*100)}%;background:${col(x)}"></div></div>`).join("");
-    const line = isToday ? `<div class="nowline" style="left:${nowPct()}%"></div>` : "";
-    return `<div class="chart"><div class="dh"><b>${name}</b><span>lägst ${fmt(min)} kl. ${hh(v.indexOf(min))} · högst ${fmt(max)} kl. ${hh(v.indexOf(max))} · snitt ${fmt(avg)}</span></div><div class="bars">${bars}${line}</div><div class="axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></div>`;
-  };
-  box.innerHTML = head + chart("Idag", vs[0], true) + chart("Imorgon", vs[1], false)
-    + `<p class="hint">${cfg.vat ? "Inklusive" : "Exklusive"} moms. Källa: elprisetjustnu.se</p>`;
+  const bars = series.map((x,i) => x === null
+    ? '<div class="b"><div class="bar" style="height:2px;opacity:.15"></div></div>'
+    : `<div class="b" title="${i < 24 ? "Idag" : "Imorgon"} ${hh(i % 24)}:00 – ${fmt(x)} öre"><div class="bar${i < hr ? " past" : ""}" style="height:${Math.max(3, x/gmax*100)}%;background:${col(x)}"></div></div>`).join("");
+  const labels = [0,6,12,18,24,30,36,42].map(i =>
+    `<span style="left:${i/48*100}%">${i === 0 ? "<b>Idag</b>" : i === 24 ? "<b>Imorgon</b>" : hh(i % 24)}</span>`).join("");
+  box.innerHTML = head + `<div class="bars">${bars}<div class="midnight"></div><div class="nowline" style="left:${nowPct()}%"></div></div><div class="axis">${labels}</div>`;
+}
+
+/* ---------- Väder (Open-Meteo, ingen nyckel behövs) ---------- */
+const WX = c => c === 0 ? ["☀️","Klart"] : c === 1 ? ["🌤️","Mest klart"] : c === 2 ? ["⛅","Halvklart"] : c === 3 ? ["☁️","Mulet"]
+  : (c === 45 || c === 48) ? ["🌫️","Dimma"] : (c >= 51 && c <= 57) ? ["🌦️","Duggregn"] : (c >= 61 && c <= 67) ? ["🌧️","Regn"]
+  : (c >= 71 && c <= 77) ? ["❄️","Snö"] : (c >= 80 && c <= 82) ? ["🌦️","Regnskurar"] : (c === 85 || c === 86) ? ["🌨️","Snöbyar"]
+  : c >= 95 ? ["⛈️","Åska"] : ["❔","–"];
+let wxCache = null;
+async function geocode(){
+  const city = cfg.city.trim();
+  if(!city || city === cfg.geoFor) return;
+  try {
+    const r = await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&language=sv&format=json&name=" + encodeURIComponent(city));
+    const x = ((await r.json()).results || [])[0];
+    if(x){
+      cfg.lat = x.latitude; cfg.lon = x.longitude; cfg.geoFor = city; wxCache = null;
+      store.set("lat", cfg.lat); store.set("lon", cfg.lon); store.set("geoFor", city);
+    }
+  } catch(e){}
+}
+async function renderWeather(){
+  const box = $("weather");
+  try {
+    if(!wxCache || Date.now() - wxCache.t > 30*60*1000){
+      const u = `https://api.open-meteo.com/v1/forecast?latitude=${cfg.lat}&longitude=${cfg.lon}&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&wind_speed_unit=ms&timezone=${encodeURIComponent(TZ)}&forecast_days=3`;
+      const r = await fetch(u);
+      if(!r.ok) throw new Error(r.status);
+      wxCache = {t: Date.now(), v: await r.json()};
+    }
+  } catch(e){ if(!wxCache){ box.innerHTML = '<p class="msg">Väder ej tillgängligt.</p>'; return; } }
+  const j = wxCache.v, d = j.daily, rd = x => Math.round(x);
+  const mm = x => x >= 0.1 ? x.toFixed(x < 10 ? 1 : 0).replace(".", ",") + " mm" : "";
+  const ic = WX(j.current.weather_code);
+  const rain0 = mm(d.precipitation_sum[0]);
+  const today = `<div class="wt"><span class="wi">${ic[0]}</span><span class="wtemp">${rd(j.current.temperature_2m)}°</span><div class="wd"><b>${ic[1]}</b><span>↑${rd(d.temperature_2m_max[0])}° ↓${rd(d.temperature_2m_min[0])}°${rain0 ? " · " + rain0 : ""} · ${rd(d.wind_speed_10m_max[0])} m/s</span></div></div>`;
+  const next = [1,2].map(i => {
+    const nm = new Date(d.time[i] + "T12:00:00").toLocaleDateString("sv-SE", {weekday:"long"});
+    const rn = mm(d.precipitation_sum[i]);
+    return `<div class="wc"><span class="d">${nm}</span><span class="wi2">${WX(d.weather_code[i])[0]}</span><span>${rd(d.temperature_2m_max[i])}° / ${rd(d.temperature_2m_min[i])}°</span>${rn ? "<small>" + rn + "</small>" : ""}</div>`;
+  }).join("");
+  box.innerHTML = today + `<div class="wn">${next}</div>`;
 }
 
 /* ---------- Kalender (Google Calendar API, privat via inloggning) ---------- */
@@ -344,7 +418,7 @@ async function loadEvents(){
       if(!r.ok) throw new Error(id + ": " + r.status);
       return (await r.json()).items || [];
     }));
-    const evs = lists.flat().map(e => {
+    const evs = lists.reduce((a,b) => a.concat(b), []).map(e => {
       const allDay = !!e.start.date;
       const st = allDay ? new Date(e.start.date + "T00:00:00") : new Date(e.start.dateTime);
       const en = allDay ? new Date(e.end.date + "T00:00:00") : new Date(e.end.dateTime);
@@ -382,7 +456,7 @@ $("count").onclick = openSettings;
 function openSettings(){
   $("cdLabel").value = cfg.cdLabel; $("cdDate").value = cfg.cdDate;
   $("clientId").value = cfg.clientId; $("calIds").value = cfg.calIds; $("vat").checked = cfg.vat;
-  $("schedOn").checked = cfg.schedOn; $("onFrom").value = cfg.onFrom; $("onTo").value = cfg.onTo;
+  $("city").value = cfg.city; $("schedOn").checked = cfg.schedOn; $("onFrom").value = cfg.onFrom; $("onTo").value = cfg.onTo;
   draftScale = cfg.calScale; showScale(); dlg.showModal();
 }
 let draftScale = cfg.calScale;
@@ -397,8 +471,9 @@ $("save").onclick = () => {
   cfg.cdLabel = $("cdLabel").value.trim(); cfg.cdDate = $("cdDate").value;
   cfg.clientId = $("clientId").value.trim(); cfg.calIds = $("calIds").value.trim(); tokenClient = null; cfg.vat = $("vat").checked; cfg.calScale = draftScale;
   cfg.schedOn = $("schedOn").checked; cfg.onFrom = $("onFrom").value || "06:00"; cfg.onTo = $("onTo").value || "23:00";
+  cfg.city = $("city").value.trim() || "Stockholm";
   Object.keys(cfg).forEach(k => store.set(k, cfg[k]));
-  dlg.close(); tick(); renderPrices(); renderCalendar(); applySchedule();
+  dlg.close(); tick(); renderPrices(); renderCalendar(); applySchedule(); geocode().then(renderWeather);
 };
 
 /* ---------- Skärmschema (wake lock + svart natt-läge) ---------- */
@@ -436,8 +511,9 @@ if("serviceWorker" in navigator && location.protocol === "https:") navigator.ser
 
 /* ---------- Start ---------- */
 tick(); setInterval(tick, 15000);
-renderPrices(); renderCalendar();
+renderPrices(); renderWeather(); renderCalendar();
 setInterval(renderPrices, 15*60*1000);
+setInterval(renderWeather, 30*60*1000);
 setInterval(() => { if(cfg.clientId && tokenOk()) loadEvents(); }, 10*60*1000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
