@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14202B">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
 <title>Hemskärm</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap">
 <style>
@@ -18,8 +20,8 @@ body{padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inse
 button,input{font:inherit;color:inherit}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .weekday{font-size:15px;color:var(--muted);font-weight:400}
-.date{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
-.clock{font-size:34px;font-weight:300;font-variant-numeric:tabular-nums;text-align:right;line-height:1.05}
+.date{font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.clock{font-size:40px;font-weight:300;font-variant-numeric:tabular-nums;text-align:right;line-height:1.05}
 .week{font-size:13px;color:var(--muted);text-align:right}
 .gear{background:none;border:1px solid var(--line);border-radius:10px;width:40px;height:40px;cursor:pointer;color:var(--muted);flex:none}
 .gear:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -43,25 +45,34 @@ h2{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:10px;display:
 .now .tag{margin-left:auto;font-size:13px;padding:3px 10px;border-radius:999px;background:var(--bg)}
 .stats{display:flex;gap:18px;margin:8px 0 14px;font-size:13px;color:var(--muted)}
 .stats b{color:var(--text);font-weight:600}
-.bars{display:flex;align-items:flex-end;gap:2px;height:110px}
-.bar{flex:1;border-radius:3px 3px 0 0;min-height:3px;background:var(--mid);opacity:.55}
-.bar.cur{opacity:1;outline:2px solid var(--text);outline-offset:1px}
+.chart{margin-top:12px}
+.dh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;color:var(--muted);margin-bottom:5px}
+.dh b{color:var(--text);font-size:15px}
+.bars{position:relative;display:flex;height:70px}
+.b{flex:1;display:flex;align-items:flex-end;padding:0 1px}
+.bar{width:100%;border-radius:2px 2px 0 0;min-height:2px;opacity:.9}
+.bar.past{opacity:.4}
+.nowline{position:absolute;top:-5px;bottom:0;width:3px;margin-left:-1.5px;background:var(--text);border-radius:2px;box-shadow:0 0 0 1.5px var(--bg);pointer-events:none}
+.nowline::before{content:"";position:absolute;top:-2px;left:-3px;width:9px;height:9px;border-radius:50%;background:var(--text);box-shadow:0 0 0 1.5px var(--bg)}
 .axis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
 .msg{font-size:14px;color:var(--muted);padding:12px 0}
 
-.day{margin-top:14px}
+.agenda{font-size:calc(16px*var(--cs,1))}
+.day{margin-top:1em}
 .day:first-child{margin-top:0}
-.day h3{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:6px;text-transform:none}
-.ev{display:flex;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:15px;line-height:1.3}
-.ev .t{width:92px;flex:none;color:var(--muted);font-variant-numeric:tabular-nums;font-size:14px}
+.day h3{font-size:.95em;font-weight:600;color:var(--accent);margin-bottom:.35em}
+.ev{display:flex;gap:.8em;padding:.5em 0;border-top:1px solid var(--line);font-size:1em;line-height:1.3}
+.ev .t{width:6.4em;flex:none;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.9em}
 .ev .w{font-weight:600}
-.ev .w small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.ev .w small{display:block;font-weight:400;color:var(--muted);font-size:.8em}
+.day.today h3{font-size:1.2em}
+.day.today .ev{font-size:1.35em}
 .signin{background:var(--text);color:var(--bg);border:0;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;margin-top:4px}
 
-dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:20px;width:min(92vw,480px);margin:auto}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:20px;width:min(92vw,480px);margin:auto;max-height:92vh;overflow:auto}
 dialog::backdrop{background:rgba(0,0,0,.6)}
 label{display:block;font-size:14px;color:var(--muted);margin:14px 0 6px}
-input[type=text],input[type=date]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color-scheme:dark}
+input[type=text],input[type=date],input[type=time]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color-scheme:dark}
 .row{display:flex;gap:10px;align-items:center;margin-top:14px;font-size:15px}
 .hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
 .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
@@ -72,26 +83,30 @@ input[type=text],input[type=date]{width:100%;background:var(--bg);border:1px sol
 @media (min-width:900px){
   body{max-width:none;margin:0;height:100vh;height:100dvh;overflow:hidden;display:grid;
     grid-template-columns:1fr 1.15fr;grid-template-rows:auto auto 1fr;
-    grid-template-areas:"top top" "count cal" "price cal";gap:16px;padding:20px 28px}
+    grid-template-areas:"top top" "count cal" "price cal";gap:16px;padding:18px 28px}
   .top{grid-area:top;align-items:center}
-  .weekday{font-size:20px}
-  .date,.clock{font-size:56px}
-  .week{font-size:15px}
-  .count{grid-area:count;margin:0;padding:22px 26px}
+  .weekday{font-size:26px}
+  .date,.clock{font-size:clamp(56px,7.6vw,100px)}
+  .week{font-size:22px}
+  .gear{width:48px;height:48px;font-size:20px}
+  .count{grid-area:count;margin:0;padding:20px 26px}
   .count .n{font-size:88px}
   .count .l{font-size:20px}
-  section{margin:0;min-height:0;padding:20px 20px}
+  section{margin:0;min-height:0;padding:16px 20px}
   section.pricebox{grid-area:price;display:flex;flex-direction:column}
   #price{flex:1;display:flex;flex-direction:column;min-height:0}
-  .bars{flex:1;height:auto;min-height:100px}
-  .now .p{font-size:68px}
-  .stats{font-size:15px}
+  .now .p{font-size:58px}
+  .chart{flex:1;display:flex;flex-direction:column;min-height:0;margin-top:8px}
+  .bars{flex:1;height:auto;min-height:40px}
+  .dh{font-size:13px}
+  .dh b{font-size:17px}
+  .axis{font-size:12px}
   h2{font-size:17px}
   section.cal{grid-area:cal;overflow-y:auto}
-  .day h3{font-size:17px}
-  .ev{font-size:18px;padding:10px 0}
-  .ev .t{width:110px;font-size:16px}
+  .agenda{font-size:calc(18px*var(--cs,1))}
 }
+#night{position:fixed;inset:0;background:#000;z-index:200}
+#night[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -105,18 +120,13 @@ input[type=text],input[type=date]{width:100%;background:var(--bg);border:1px sol
     <div class="clock" id="clock"></div>
     <div class="week" id="week"></div>
   </div>
-  <button class="gear" id="openSettings" aria-label="Inställningar">⚙</button>
+  <div style="display:flex;gap:8px"><button class="gear" id="fs" type="button" aria-label="Fullskärm" hidden>⛶</button><button class="gear" id="openSettings" aria-label="Inställningar">⚙</button></div>
 </header>
 
 <button class="count empty" id="count" type="button"></button>
 
 <section class="pricebox" aria-labelledby="elh">
-  <h2 id="elh">Elpris SE3
-    <span class="seg" role="group" aria-label="Dag">
-      <button type="button" id="dToday" aria-pressed="true">Idag</button>
-      <button type="button" id="dTomorrow" aria-pressed="false">Imorgon</button>
-    </span>
-  </h2>
+  <h2 id="elh"><span>Elpris SE3</span><span style="font-weight:400;font-size:13px">öre/kWh</span></h2>
   <div id="price"></div>
 </section>
 
@@ -124,6 +134,8 @@ input[type=text],input[type=date]{width:100%;background:var(--bg);border:1px sol
   <h2 id="calh">Kalender</h2>
   <div id="calbox"></div>
 </section>
+
+<div id="night" hidden aria-hidden="true"></div>
 
 <dialog id="settings">
   <h2 style="font-size:20px;color:var(--text)">Inställningar</h2>
@@ -138,6 +150,22 @@ input[type=text],input[type=date]{width:100%;background:var(--bg);border:1px sol
   <label for="calIds">Kalender-ID (flera separeras med komma)</label>
   <input type="text" id="calIds" placeholder="xxxx@group.calendar.google.com">
   <p class="hint">Client ID skapas i Google Cloud (se instruktionerna). Kalender-ID hittar du i kalenderns inställningar under ”Integrera kalender”. Skriv primary för din egen huvudkalender.</p>
+
+  <label>Textstorlek i kalendern</label>
+  <div class="row" style="margin-top:0">
+    <button class="btn" id="csDown" type="button" aria-label="Mindre text">A−</button>
+    <span id="csVal" style="min-width:64px;text-align:center"></span>
+    <button class="btn" id="csUp" type="button" aria-label="Större text">A+</button>
+  </div>
+  <p class="hint">Dagens händelser visas alltid i större text än kommande dagar.</p>
+
+  <div class="row">
+    <input type="checkbox" id="schedOn"> <label for="schedOn" style="margin:0;color:var(--text)">Skärmschema: håll skärmen tänd, svart på natten</label>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <label for="onFrom" style="margin:0">Tänd från</label><input type="time" id="onFrom" style="width:auto">
+    <label for="onTo" style="margin:0">till</label><input type="time" id="onTo" style="width:auto">
+  </div>
 
   <div class="row">
     <input type="checkbox" id="vat"> <label for="vat" style="margin:0;color:var(--text)">Visa pris inklusive moms (25 %)</label>
@@ -161,7 +189,11 @@ const cfg = {
   cdDate:  store.get("cdDate", ""),
   clientId: store.get("clientId", ""),
   calIds:  store.get("calIds", ""),
-  vat:     store.get("vat", false)
+  vat:     store.get("vat", false),
+  calScale: store.get("calScale", 100),
+  schedOn: store.get("schedOn", true),
+  onFrom:  store.get("onFrom", "06:00"),
+  onTo:    store.get("onTo", "23:00")
 };
 
 /* ---------- Datum, klocka, veckonummer ---------- */
@@ -172,6 +204,7 @@ function isoWeek(d){
   const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
   return Math.ceil(((t - y0) / 864e5 + 1) / 7);
 }
+let lastHr = new Date().getHours();
 function tick(){
   const now = new Date();
   $("weekday").textContent = now.toLocaleDateString("sv-SE", {weekday:"long", timeZone:TZ});
@@ -179,6 +212,9 @@ function tick(){
   $("clock").textContent = now.toLocaleTimeString("sv-SE", {hour:"2-digit", minute:"2-digit", timeZone:TZ});
   $("week").textContent = "vecka " + isoWeek(now);
   renderCountdown();
+  const nl = document.querySelector(".nowline"); if(nl) nl.style.left = nowPct() + "%";
+  if(now.getHours() !== lastHr){ lastHr = now.getHours(); renderPrices(); }
+  applySchedule();
 }
 
 /* ---------- Nedräkning ---------- */
@@ -204,7 +240,6 @@ function renderCountdown(){
 function esc(s){ return s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 /* ---------- Elpris SE3 (elprisetjustnu.se) ---------- */
-let showDay = "today";
 const cache = {};
 function dayUrl(offset){
   const d = new Date(); d.setDate(d.getDate() + offset);
@@ -225,53 +260,40 @@ async function loadPrices(offset){
 }
 const ore = sek => sek * 100 * (cfg.vat ? 1.25 : 1);
 const fmt = n => n.toLocaleString("sv-SE", {maximumFractionDigits:0});
+const hh = i => String(i).padStart(2,"0");
+const nowPct = () => { const n = new Date(); return ((n.getHours() + n.getMinutes()/60) / 24 * 100).toFixed(2); };
 
 async function renderPrices(){
   const box = $("price");
-  const offset = showDay === "today" ? 0 : 1;
-  box.innerHTML = '<p class="msg">Hämtar priser…</p>';
-  let h;
-  try { h = await loadPrices(offset); }
-  catch(e){
-    box.innerHTML = '<p class="msg">' + (offset === 1
-      ? "Morgondagens priser publiceras vanligtvis runt kl. 13."
-      : "Kunde inte hämta priser. Kontrollera internetanslutningen och att sidan öppnas i en vanlig webbläsare.") + '</p>';
-    return;
-  }
-  const vals = h.map(v => v === null ? null : ore(v));
-  const ok = vals.filter(v => v !== null);
-  if(!ok.length){ box.innerHTML = '<p class="msg">Inga priser tillgängliga.</p>'; return; }
-  const min = Math.min(...ok), max = Math.max(...ok), avg = ok.reduce((s,n)=>s+n,0)/ok.length;
-  const hr = new Date().getHours();
-  const curIdx = offset === 0 ? hr : -1;
-  const sorted = [...ok].sort((a,b)=>a-b);
+  if(!box.children.length) box.innerHTML = '<p class="msg">Hämtar priser…</p>';
+  const res = await Promise.allSettled([loadPrices(0), loadPrices(1)]);
+  const vs = res.map(r => r.status === "fulfilled" ? r.value.map(v => v === null ? null : ore(v)) : null);
+  const all = vs.filter(Boolean).flat().filter(v => v !== null);
+  if(!all.length){ box.innerHTML = '<p class="msg">Kunde inte hämta priser. Kontrollera internetanslutningen.</p>'; return; }
+  const gmax = Math.max(...all);
+  const sorted = [...all].sort((a,b) => a-b);
   const lo = sorted[Math.floor(sorted.length/3)], hi = sorted[Math.floor(sorted.length*2/3)];
   const col = v => v <= lo ? "var(--cheap)" : v >= hi ? "var(--high)" : "var(--mid)";
-
-  let top = "";
-  if(curIdx >= 0 && vals[curIdx] !== null){
-    const c = vals[curIdx];
+  const hr = new Date().getHours();
+  const c = vs[0] ? vs[0][hr] : null;
+  let head = "";
+  if(c !== null && c !== undefined){
     const label = c <= lo ? "Billigt" : c >= hi ? "Dyrt" : "Normalt";
-    top = `<div class="now"><span class="p" style="color:${col(c)}">${fmt(c)}</span><span class="u">öre/kWh just nu</span><span class="tag" style="color:${col(c)}">${label}</span></div>`;
-  } else {
-    top = `<div class="now"><span class="p">${fmt(avg)}</span><span class="u">öre/kWh i snitt</span></div>`;
+    head = `<div class="now"><span class="p" style="color:${col(c)}">${fmt(c)}</span><span class="u">öre/kWh just nu</span><span class="tag" style="color:${col(c)}">${label}</span></div>`;
   }
-  const minH = vals.indexOf(min), maxH = vals.indexOf(max);
-  const hh = i => String(i).padStart(2,"0") + ":00";
-  const stats = `<div class="stats"><span>Lägst <b>${fmt(min)}</b> kl. ${hh(minH)}</span><span>Högst <b>${fmt(max)}</b> kl. ${hh(maxH)}</span><span>Snitt <b>${fmt(avg)}</b></span></div>`;
-  const bars = vals.map((v,i) => v === null ? '<div class="bar" style="height:3px;opacity:.2"></div>'
-    : `<div class="bar${i===curIdx?" cur":""}" title="${hh(i)}: ${fmt(v)} öre" style="height:${Math.max(3, v/max*100)}%;background:${col(v)}"></div>`).join("");
-  box.innerHTML = top + stats + `<div class="bars">${bars}</div><div class="axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>`
+  const chart = (name, v, isToday) => {
+    if(!v) return `<div class="chart"><div class="dh"><b>${name}</b></div><p class="msg">Publiceras vanligtvis runt kl. 13.</p></div>`;
+    const ok = v.filter(x => x !== null);
+    const min = Math.min(...ok), max = Math.max(...ok), avg = ok.reduce((s,n) => s+n, 0) / ok.length;
+    const bars = v.map((x,i) => x === null
+      ? '<div class="b"><div class="bar" style="height:2px;opacity:.2"></div></div>'
+      : `<div class="b" title="${hh(i)}:00 – ${fmt(x)} öre"><div class="bar${isToday && i < hr ? " past" : ""}" style="height:${Math.max(3, x/gmax*100)}%;background:${col(x)}"></div></div>`).join("");
+    const line = isToday ? `<div class="nowline" style="left:${nowPct()}%"></div>` : "";
+    return `<div class="chart"><div class="dh"><b>${name}</b><span>lägst ${fmt(min)} kl. ${hh(v.indexOf(min))} · högst ${fmt(max)} kl. ${hh(v.indexOf(max))} · snitt ${fmt(avg)}</span></div><div class="bars">${bars}${line}</div><div class="axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></div>`;
+  };
+  box.innerHTML = head + chart("Idag", vs[0], true) + chart("Imorgon", vs[1], false)
     + `<p class="hint">${cfg.vat ? "Inklusive" : "Exklusive"} moms. Källa: elprisetjustnu.se</p>`;
 }
-function setDay(d){
-  showDay = d;
-  $("dToday").setAttribute("aria-pressed", d === "today");
-  $("dTomorrow").setAttribute("aria-pressed", d === "tomorrow");
-  renderPrices();
-}
-$("dToday").onclick = () => setDay("today");
-$("dTomorrow").onclick = () => setDay("tomorrow");
 
 /* ---------- Kalender (Google Calendar API, privat via inloggning) ---------- */
 const SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
@@ -340,13 +362,13 @@ async function loadEvents(){
     const keys = Object.keys(byDay);
     if(!keys.length){ calMsg('<p class="msg">Inga händelser de närmaste 7 dagarna.</p>'); return; }
     const hm = d => d.toLocaleTimeString("sv-SE", {hour:"2-digit", minute:"2-digit"});
-    calMsg(keys.map(k => {
+    calMsg('<div class="agenda">' + keys.map(k => {
       const {d0, list} = byDay[k];
       const title = k === "0" ? "Idag" : k === "1" ? "Imorgon" : d0.toLocaleDateString("sv-SE", {weekday:"long", day:"numeric", month:"long"});
-      return `<div class="day"><h3>${title}</h3>` + list.map(e =>
+      return `<div class="day${k === "0" ? " today" : ""}"><h3>${title}</h3>` + list.map(e =>
         `<div class="ev"><span class="t">${e.allDay ? "Heldag" : hm(e.st) + "–" + hm(e.en)}</span><span class="w">${esc(e.t)}${e.loc ? "<small>" + esc(e.loc) + "</small>" : ""}</span></div>`
       ).join("") + "</div>";
-    }).join(""));
+    }).join("") + "</div>");
   } catch(err){
     if(err === "auth") { renderCalendar(); return; }
     calMsg(`<p class="msg">Kunde inte hämta kalendern (${esc(String(err.message || err))}). Kontrollera kalender-ID och att Google Calendar API är aktiverat i ditt Cloud-projekt.</p>`);
@@ -360,15 +382,57 @@ $("count").onclick = openSettings;
 function openSettings(){
   $("cdLabel").value = cfg.cdLabel; $("cdDate").value = cfg.cdDate;
   $("clientId").value = cfg.clientId; $("calIds").value = cfg.calIds; $("vat").checked = cfg.vat;
-  dlg.showModal();
+  $("schedOn").checked = cfg.schedOn; $("onFrom").value = cfg.onFrom; $("onTo").value = cfg.onTo;
+  draftScale = cfg.calScale; showScale(); dlg.showModal();
 }
+let draftScale = cfg.calScale;
+function applyScale(p){ document.documentElement.style.setProperty("--cs", p / 100); }
+function showScale(){ $("csVal").textContent = draftScale + " %"; applyScale(draftScale); }
+$("csDown").onclick = () => { draftScale = Math.max(60, draftScale - 10); showScale(); };
+$("csUp").onclick = () => { draftScale = Math.min(200, draftScale + 10); showScale(); };
+dlg.addEventListener("close", () => applyScale(cfg.calScale));
+applyScale(cfg.calScale);
 $("cancel").onclick = () => dlg.close();
 $("save").onclick = () => {
   cfg.cdLabel = $("cdLabel").value.trim(); cfg.cdDate = $("cdDate").value;
-  cfg.clientId = $("clientId").value.trim(); cfg.calIds = $("calIds").value.trim(); tokenClient = null; cfg.vat = $("vat").checked;
+  cfg.clientId = $("clientId").value.trim(); cfg.calIds = $("calIds").value.trim(); tokenClient = null; cfg.vat = $("vat").checked; cfg.calScale = draftScale;
+  cfg.schedOn = $("schedOn").checked; cfg.onFrom = $("onFrom").value || "06:00"; cfg.onTo = $("onTo").value || "23:00";
   Object.keys(cfg).forEach(k => store.set(k, cfg[k]));
-  dlg.close(); tick(); renderPrices(); renderCalendar();
+  dlg.close(); tick(); renderPrices(); renderCalendar(); applySchedule();
 };
+
+/* ---------- Skärmschema (wake lock + svart natt-läge) ---------- */
+let wl = null, peekUntil = 0;
+const toMin = t => { const [h,m] = (t || "0:0").split(":").map(Number); return h*60 + (m || 0); };
+function isDay(){
+  const n = new Date(), m = n.getHours()*60 + n.getMinutes();
+  const a = toMin(cfg.onFrom), b = toMin(cfg.onTo);
+  return a <= b ? (m >= a && m < b) : (m >= a || m < b);
+}
+async function setWake(want){
+  try {
+    if(!("wakeLock" in navigator)) return;
+    if(want && !wl && document.visibilityState === "visible"){
+      wl = await navigator.wakeLock.request("screen");
+      wl.addEventListener("release", () => { wl = null; });
+    } else if(!want && wl){ const w = wl; wl = null; await w.release(); }
+  } catch(e){ wl = null; }
+}
+function applySchedule(){
+  const day = !cfg.schedOn || isDay();
+  $("night").hidden = day || Date.now() < peekUntil;
+  setWake(day);
+}
+$("night").onclick = () => { peekUntil = Date.now() + 60000; applySchedule(); };
+document.addEventListener("visibilitychange", applySchedule);
+
+/* ---------- Fullskärm / PWA ---------- */
+const isApp = matchMedia("(display-mode: fullscreen), (display-mode: standalone)").matches;
+if(!isApp && document.documentElement.requestFullscreen){
+  $("fs").hidden = false;
+  $("fs").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(()=>{});
+}
+if("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 
 /* ---------- Start ---------- */
 tick(); setInterval(tick, 15000);
