@@ -19,7 +19,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font)}
 body{padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));max-width:560px;margin:0 auto}
 button,input{font:inherit;color:inherit}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.dl{display:flex;flex-wrap:wrap;align-items:baseline}
+.dl{display:flex;flex-wrap:wrap;align-items:baseline;flex:1;min-width:0}
+.hr{display:flex;align-items:center;flex:none;margin-left:12px}
+.hr .clock{margin-right:10px}
 .dl>*+*{margin-left:16px}
 .wk{font-size:15px;color:var(--muted);font-weight:400}
 .date{font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
@@ -108,6 +110,21 @@ input[type=text],input[type=date],input[type=time]{width:100%;background:var(--b
 .mb span{display:block;font-size:8px;letter-spacing:0;color:var(--muted);white-space:nowrap}
 .mb b{display:block;font-size:19px;font-weight:800;color:var(--text);line-height:1.15;white-space:nowrap}
 .mb small{display:block;font-size:10px;font-weight:600;color:var(--muted);line-height:1.2;white-space:nowrap}
+.brow>*+*{margin-top:14px}
+.car{display:flex;flex-direction:column;justify-content:space-between;min-height:150px;padding:12px 14px}
+.cr{display:flex;justify-content:space-between;align-items:baseline;font-size:10px;color:var(--muted);letter-spacing:.02em}
+.cr span+span{margin-left:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;min-width:0}
+.cs{display:flex;align-items:baseline}
+.cs b{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.cs small{font-size:16px;font-weight:600;color:var(--muted);margin-left:2px}
+.cbar{height:6px;border-radius:3px;background:var(--bg);overflow:hidden}
+.cbar i{display:block;height:100%;border-radius:3px}
+.ct{font-size:15px;font-weight:600;line-height:1.25}
+.ct span{display:block;font-size:12px;font-weight:400;color:var(--muted);min-height:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl{display:flex;align-items:center;font-size:17px;font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%;margin-right:8px;flex:none;display:inline-block}
+.ar svg{display:block;margin:0 auto}
+#carRaw{max-height:150px;overflow:auto;font-size:11px;background:var(--bg);padding:8px;border-radius:8px;white-space:pre-wrap;margin-top:8px}
 .nowp{display:flex;align-items:baseline}
 .nowp .p{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
 .nowp .u{font-size:12px;font-weight:400;color:var(--muted);margin-left:6px}
@@ -152,7 +169,10 @@ input[type=text],input[type=date],input[type=time]{width:100%;background:var(--b
   section.pricebox{flex:1;display:flex;flex-direction:column}
   #price{flex:1;display:flex;flex-direction:column;min-height:0}
   .now .p{font-size:44px}
+  .brow{display:flex;align-items:stretch;flex:none}
+  .brow>*+*{margin-top:0;margin-left:14px}
   .planes{flex:none;width:60%}
+  .car{flex:1;min-width:0}
   .bars{flex:1;height:auto;min-height:40px}
   section.cal{flex:1;overflow-y:auto}
   .agenda{font-size:calc(18px*var(--cs,1))}
@@ -175,8 +195,8 @@ window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reas
     <div class="date" id="date"></div>
     <div class="wk"><span id="weekday"></span> · <span id="week"></span></div>
   </div>
-  <div class="clock" id="clock"></div>
-  <div class="tools"><button class="gear" id="fs" type="button" aria-label="Fullskärm" hidden>⛶&#xFE0E;</button><button class="gear" id="openSettings" type="button" aria-label="Inställningar"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button></div>
+  <div class="hr"><div class="clock" id="clock"></div>
+  <div class="tools"><button class="gear" id="fs" type="button" aria-label="Fullskärm" hidden>⛶&#xFE0E;</button><button class="gear" id="openSettings" type="button" aria-label="Inställningar"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button></div></div>
 </header>
 
 <div class="col" id="colL">
@@ -185,7 +205,10 @@ window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reas
     <h2 id="elh"><span>Elpris SE3</span><span id="nowp" class="nowp"></span></h2>
     <div id="price"></div>
   </section>
-  <section class="planes" id="planes" aria-label="Flyg"></section>
+  <div class="brow">
+    <section class="planes" id="planes" aria-label="Flyg"></section>
+    <section class="car" id="car" aria-label="Bil"></section>
+  </div>
 </div>
 
 <div class="col" id="colR">
@@ -220,6 +243,15 @@ window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reas
 
   <label for="proxy">Proxy-adress för flygdata (valfri)</label>
   <input type="text" id="proxy" placeholder="https://flygproxy.dittnamn.workers.dev">
+
+  <label for="vin">Bil: VIN-nummer (Škoda Enyaq)</label>
+  <input type="text" id="vin" placeholder="17 tecken" autocapitalize="characters" autocomplete="off">
+  <label for="ptoken">Bil: proxy-lösenord</label>
+  <input type="text" id="ptoken" autocomplete="off">
+  <label for="carMin">Bil: uppdatera högst var … minut (minst 10)</label>
+  <input type="text" id="carMin" inputmode="numeric" placeholder="30">
+  <div class="row"><button class="btn" id="carDebug" type="button">Visa bilens rådata</button></div>
+  <pre id="carRaw" hidden></pre>
 
   <label for="clientId">Google Client ID</label>
   <input type="text" id="clientId" placeholder="123456-abc.apps.googleusercontent.com">
@@ -275,6 +307,9 @@ const cfg = {
   flLon:   store.get("flLon", ""),
   flRad:   store.get("flRad", 20),
   proxy:   store.get("proxy", ""),
+  vin:     store.get("vin", ""),
+  proxyToken: store.get("proxyToken", ""),
+  carMin:  store.get("carMin", 30),
   schedOn: store.get("schedOn", true),
   onFrom:  store.get("onFrom", "06:00"),
   onTo:    store.get("onTo", "23:00")
@@ -288,7 +323,7 @@ function isoWeek(d){
   const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
   return Math.ceil(((t - y0) / 864e5 + 1) / 7);
 }
-let lastHr = new Date().getHours();
+let lastHr = new Date().getHours(), wasDay = true;
 function tick(){
   const now = new Date();
   $("weekday").textContent = now.toLocaleDateString("sv-SE", {weekday:"long", timeZone:TZ});
@@ -299,6 +334,9 @@ function tick(){
   const nl = document.querySelector(".nowline"); if(nl) nl.style.left = nowPct() + "%";
   if(now.getHours() !== lastHr){ lastHr = now.getHours(); renderPrices(); renderWeather(); }
   applySchedule();
+  const dayNow = !cfg.schedOn || isDay();
+  if(dayNow && !wasDay) refreshAll();
+  wasDay = dayNow;
   const mins = now.getHours()*60 + now.getMinutes();
   if(tomorrowMissing && mins >= 12*60+45 && mins < 14*60 && Date.now() - lastPriceTry >= 10*60000) renderPrices();
 }
@@ -527,7 +565,7 @@ $("count").onclick = openSettings;
 function openSettings(){
   $("cdLabel").value = cfg.cdLabel; $("cdDate").value = cfg.cdDate;
   $("clientId").value = cfg.clientId; $("calIds").value = cfg.calIds; $("vat").checked = cfg.vat;
-  $("city").value = cfg.city; $("flLat").value = cfg.flLat; $("flLon").value = cfg.flLon; $("flRad").value = cfg.flRad; $("proxy").value = cfg.proxy; $("schedOn").checked = cfg.schedOn; $("onFrom").value = cfg.onFrom; $("onTo").value = cfg.onTo;
+  $("city").value = cfg.city; $("flLat").value = cfg.flLat; $("flLon").value = cfg.flLon; $("flRad").value = cfg.flRad; $("proxy").value = cfg.proxy; $("vin").value = cfg.vin; $("ptoken").value = cfg.proxyToken; $("carMin").value = cfg.carMin; $("carRaw").hidden = true; $("schedOn").checked = cfg.schedOn; $("onFrom").value = cfg.onFrom; $("onTo").value = cfg.onTo;
   draftScale = cfg.calScale; showScale(); dlg.showModal();
 }
 let draftScale = cfg.calScale;
@@ -538,6 +576,20 @@ $("csUp").onclick = () => { draftScale = Math.min(200, draftScale + 10); showSca
 dlg.addEventListener("close", () => applyScale(cfg.calScale));
 applyScale(cfg.calScale);
 $("cancel").onclick = () => dlg.close();
+$("carDebug").onclick = async () => {
+  const pre = $("carRaw");
+  pre.hidden = false; pre.textContent = "Hämtar…";
+  try {
+    const u = "https://public.api.connect.skoda-auto.cz/api/v1/vehicles/" + encodeURIComponent($("vin").value.replace(/\s+/g, "").toUpperCase());
+    const p = $("proxy").value.trim().replace(/\/+$/, "");
+    const r = await fetch(p + "/?url=" + encodeURIComponent(u) + "&token=" + encodeURIComponent($("ptoken").value.trim()), {cache:"no-store"});
+    const txt = await r.text();
+    let out;
+    try { out = JSON.stringify(JSON.parse(txt), (k, v) => /^(vin|licenseplate|latitude|longitude|lat|lon|name|renderurl)$|address|street|city/i.test(k) && typeof v !== "object" ? "***" : (typeof v === "string" ? v.replace(/[A-HJ-NPR-Z0-9]{17}/g, "***") : v), 1); }
+    catch(x){ out = txt.replace(/[A-HJ-NPR-Z0-9]{17}/g, "***"); }
+    pre.textContent = "HTTP " + r.status + "\n" + out.slice(0, 6000);
+  } catch(err){ pre.textContent = "Fel: " + (err.message || err); }
+};
 $("save").onclick = () => {
   cfg.cdLabel = $("cdLabel").value.trim(); cfg.cdDate = $("cdDate").value;
   cfg.clientId = $("clientId").value.trim(); cfg.calIds = $("calIds").value.trim(); tokenClient = null; cfg.vat = $("vat").checked; cfg.calScale = draftScale;
@@ -546,8 +598,9 @@ $("save").onclick = () => {
   cfg.flLat = $("flLat").value.trim().replace(",", "."); cfg.flLon = $("flLon").value.trim().replace(",", ".");
   cfg.flRad = parseFloat($("flRad").value.replace(",", ".")) || 20;
   cfg.proxy = $("proxy").value.trim();
+  cfg.vin = $("vin").value.replace(/\s+/g, "").toUpperCase(); cfg.proxyToken = $("ptoken").value.trim(); cfg.carMin = Math.max(10, parseInt($("carMin").value, 10) || 30);
   Object.keys(cfg).forEach(k => store.set(k, cfg[k]));
-  dlg.close(); tick(); renderPrices(); renderCalendar(); applySchedule(); geocode().then(renderWeather); renderPlanes();
+  dlg.close(); tick(); renderPrices(); renderCalendar(); applySchedule(); geocode().then(renderWeather); renderPlanes(); renderCar(true);
 };
 
 /* ---------- Flyg (adsb.fi/adsb.lol för position, adsbdb + hexdb för rutt) ---------- */
@@ -555,9 +608,9 @@ const routeCache = {};
 let routeErr = false, planesBusy = false;
 const tx = x => esc(String(x == null ? "" : x));
 const norm = x => String(x || "").replace(/\s+/g, "").toUpperCase();
-function viaProxy(u){
+function viaProxy(u, tok){
   const p = (cfg.proxy || "").trim().replace(/\/+$/, "");
-  return p ? p + "/?url=" + encodeURIComponent(u) : u;
+  return p ? p + "/?url=" + encodeURIComponent(u) + (tok && cfg.proxyToken ? "&token=" + encodeURIComponent(cfg.proxyToken) : "") : u;
 }
 function planePos(){
   const la = parseFloat(cfg.flLat), lo = parseFloat(cfg.flLon), km = parseFloat(cfg.flRad) || 20;
@@ -632,7 +685,7 @@ function planeCard(f){
   return `<div class="fc"><div class="fh"><div class="fl"><b>${e(f.fn)}</b><span class="al">${e(f.airline)}</span></div>`
     + `<svg class="fp" viewBox="0 0 32 32" aria-hidden="true" style="transform:rotate(${f.trk == null ? 0 : f.trk}deg);opacity:${f.none ? .2 : 1}"><polygon points="${PLANE_PTS}"/></svg></div>`
     + `<div class="fr"><div class="fa"><b>${e(o.code)}</b><span>${e(o.city)}</span></div>`
-    + `<div class="ar" style="opacity:${o.code && d.code ? 1 : .2}">▶</div>`
+    + `<div class="ar" style="opacity:${o.code && d.code ? 1 : .2}"><svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path d="M1 1l8 4-8 4z" fill="currentColor"/></svg></div>`
     + `<div class="fa"><b>${e(d.code)}</b><span>${e(d.city)}</span></div></div>`
     + `<div class="fm">${m("AVSTÅND", f.dist, "KM")}${m("HÖJD", f.alt, "M")}${m("HASTIGHET", f.spd, "KM/H")}${m("KURS", f.deg, f.dir)}</div></div>`;
 }
@@ -641,8 +694,8 @@ async function renderPlanes(){
   planesBusy = true;
   const box = $("planes");
   try {
+    if(!box.children.length) box.innerHTML = planeCard({none:true});
     if(cfg.schedOn && !isDay()) return;
-    if(!box.children.length) box.innerHTML = planeCard({airline:"Hämtar flyg…", none:true});
     const q = planePos();
     let ac;
     try { ac = await fetchAircraft(q); }
@@ -671,6 +724,81 @@ async function renderPlanes(){
   } finally { planesBusy = false; }
 }
 
+/* ---------- Bil (MyŠkoda Public API via proxy, endast läsning) ---------- */
+let lastCarTry = 0, carBackoff = 0, lastCar = {};
+const fmtT = ms => {
+  const d = new Date(ms), t = d.toLocaleTimeString("sv-SE", {hour:"2-digit", minute:"2-digit"});
+  return d.toDateString() === new Date().toDateString() ? t : d.toLocaleDateString("sv-SE", {day:"numeric", month:"short"}) + " " + t;
+};
+function leafs(o, path, out){
+  out = out || [];
+  if(o && typeof o === "object") Object.keys(o).forEach(k => leafs(o[k], path ? path + "." + k : k, out));
+  else out.push([path, o]);
+  return out;
+}
+function stateText(state, plug){
+  const s = String(state || "").toUpperCase();
+  if(/CHARGING/.test(s) && !/NOT|READY|STOP|ERROR|COMPLETE/.test(s)) return "Laddar";
+  if(/COMPLETE|FINISH|DONE|FULL/.test(s)) return "Laddning klar";
+  if(s === "CONNECT_CABLE" || plug === "DISCONNECTED") return "Ej ansluten";
+  if(plug === "CONNECTED") return "Ansluten";
+  return s ? s.charAt(0) + s.slice(1).toLowerCase().replace(/_/g, " ") : "";
+}
+function carInfo(v){
+  const ov = (v.status && v.status.overall) || {}, st = (v.charging && v.charging.status) || {}, bat = st.battery || {};
+  const soc = typeof bat.stateOfChargeInPercent === "number" ? bat.stateOfChargeInPercent : null;
+  const km = typeof bat.remainingCruisingRangeInMeters === "number" ? bat.remainingCruisingRangeInMeters / 1000 : null;
+  const txt = stateText(st.state, st.plugConnectionState), charging = txt === "Laddar";
+  let sub = km != null ? Math.round(km) + " km räckvidd" : "";
+  if(charging){
+    const kw = typeof st.chargePowerInKw === "number" && st.chargePowerInKw > 0 ? Math.round(st.chargePowerInKw) + " kW" : "";
+    const mi = st.remainingTimeToFullyChargedInMinutes, left = typeof mi === "number" && mi > 0 ? Math.floor(mi/60) + " h " + (mi % 60) + " min kvar" : "";
+    sub = [kw, left].filter(Boolean).join(" · ") || sub;
+  }
+  const lk = String(ov.reliableLockStatus || "").toUpperCase(), l2 = String(ov.locked || "").toUpperCase(), dl = String(ov.doorsLocked || "").toUpperCase();
+  const locked = lk === "LOCKED" ? true : lk === "UNLOCKED" ? false : (l2 === "YES" || dl === "YES") ? true : (l2 === "NO" || dl === "NO") ? false : null;
+  const ts = leafs(v, "").filter(p => /capturedtimestamp/i.test(p[0]) && typeof p[1] === "string" && !isNaN(Date.parse(p[1]))).map(p => Date.parse(p[1]));
+  return {soc: soc, sub: sub, stateTxt: txt, charging: charging, locked: locked, time: ts.length ? Math.max.apply(null, ts) : null};
+}
+function carHtml(c){
+  c = c || {};
+  const e = x => x ? tx(x) : "&nbsp;";
+  const col = c.charging ? "var(--cheap)" : (c.soc != null && c.soc <= 20) ? "var(--high)" : "var(--text)";
+  const lockCol = c.locked === true ? "var(--cheap)" : c.locked === false ? "var(--high)" : "var(--line)";
+  const lockTxt = c.locked === true ? "Låst" : c.locked === false ? "Olåst" : "";
+  const up = c.note ? c.note : c.time ? "uppd. " + fmtT(c.time) : c.fetched ? "hämtad " + fmtT(c.fetched) : "";
+  const pct = c.soc == null ? 0 : Math.max(0, Math.min(100, c.soc));
+  return `<div class="cr"><span>ENYAQ</span><span>${e(up)}</span></div>`
+    + `<div class="cs"><b style="color:${col}">${c.soc == null ? "&nbsp;" : Math.round(c.soc)}</b><small>${c.soc == null ? "" : "%"}</small></div>`
+    + `<div class="cbar"><i style="width:${pct}%;background:${col}"></i></div>`
+    + `<div class="ct">${e(c.stateTxt)}<span>${e(c.sub)}</span></div>`
+    + `<div class="cl"><i class="dot" style="background:${lockCol}"></i>${e(lockTxt)}</div>`;
+}
+async function renderCar(force){
+  const box = $("car");
+  if(!(cfg.vin || "").trim() || !(cfg.proxy || "").trim() || !(cfg.proxyToken || "").trim()){
+    box.innerHTML = carHtml({note:"Lägg till bil i ⚙"}); return;
+  }
+  if(!box.children.length) box.innerHTML = carHtml(lastCar);
+  if(cfg.schedOn && !isDay()) return;
+  if((!force && Date.now() - lastCarTry < Math.max(10, cfg.carMin || 30) * 60000) || Date.now() < carBackoff) return;
+  lastCarTry = Date.now();
+  try {
+    const u = "https://public.api.connect.skoda-auto.cz/api/v1/vehicles/" + encodeURIComponent(cfg.vin.trim());
+    const r = await fetch(viaProxy(u, true), {cache:"no-store"});
+    if(r.status === 429){ carBackoff = Date.now() + (parseInt(r.headers.get("Retry-After"), 10) || 600) * 1000; throw new Error("för många anrop"); }
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    lastCar = carInfo(j.vehicle || j);
+    lastCar.fetched = Date.now();
+    const exp = Date.parse(r.headers.get("X-API-Key-Expires-At") || "");
+    if(!isNaN(exp) && exp - Date.now() < 14*86400000) lastCar.note = "nyckel går ut " + fmtT(exp).split(" ").slice(0, 2).join(" ");
+    box.innerHTML = carHtml(lastCar);
+  } catch(err){
+    box.innerHTML = carHtml(Object.assign({}, lastCar, {note: "fel: " + (err.message || err)}));
+  }
+}
+
 /* ---------- Skärmschema (wake lock + svart natt-läge) ---------- */
 let wl = null, peekUntil = 0;
 const toMin = t => { const [h,m] = (t || "0:0").split(":").map(Number); return h*60 + (m || 0); };
@@ -694,7 +822,7 @@ function applySchedule(){
   setWake(day);
 }
 $("night").onclick = () => { peekUntil = Date.now() + 60000; applySchedule(); };
-function refreshAll(){ renderPrices(); renderWeather(); renderCalendar(); renderPlanes(); }
+function refreshAll(){ renderPrices(); renderWeather(); renderCalendar(); renderPlanes(); renderCar(); }
 document.addEventListener("visibilitychange", () => { applySchedule(); if(document.visibilityState === "visible") refreshAll(); });
 window.addEventListener("online", refreshAll);
 
@@ -712,6 +840,7 @@ renderPrices(); renderWeather(); renderCalendar();
 setInterval(renderPrices, 15*60*1000);
 setInterval(renderWeather, 30*60*1000);
 renderPlanes(); setInterval(renderPlanes, 20000);
+renderCar(); setInterval(renderCar, 60*1000);
 setInterval(renderCalendar, 5*60*1000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
