@@ -52,7 +52,7 @@ h2{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:10px;display:
 .chart{margin-top:12px}
 .dh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;color:var(--muted);margin-bottom:5px}
 .dh b{color:var(--text);font-size:15px}
-.bars{position:relative;display:flex;height:120px}
+.bars{position:relative;display:flex;height:80px}
 .b{flex:1;display:flex;align-items:flex-end;padding:0 1px}
 .bar{width:100%;border-radius:2px 2px 0 0;min-height:2px;opacity:.9}
 .bar.past{opacity:.4}
@@ -88,6 +88,35 @@ input[type=text],input[type=date],input[type=time]{width:100%;background:var(--b
 .btn{border-radius:10px;padding:10px 18px;border:1px solid var(--line);background:none;cursor:pointer}
 .btn.primary{background:var(--accent);color:#1A1405;border-color:var(--accent);font-weight:600}
 
+.planes{padding:12px 12px}
+.fh{display:flex;justify-content:space-between;align-items:flex-start;height:62px}
+.fl{flex:1;min-width:0}
+.fl b{display:block;font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1;color:var(--text);white-space:nowrap}
+.fl .al{display:block;font-size:14px;color:var(--accent);margin-top:5px;min-height:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp{width:46px;height:46px;flex:none;margin-left:6px}
+.fp polygon{fill:var(--accent)}
+.fr{display:flex;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:5px 0;margin:4px 0 8px}
+.fa{flex:1;min-width:0;text-align:center}
+.fa b{display:block;font-size:30px;font-weight:800;letter-spacing:-.01em;line-height:1.05;color:var(--text)}
+.fa span{display:block;font-size:12px;color:var(--muted);min-height:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ar{flex:none;width:26px;text-align:center;color:var(--muted);font-size:16px}
+.fm{display:flex}
+.mb{flex:1;min-width:0;background:var(--bg);border-radius:12px;padding:5px 5px;overflow:hidden}
+.mb+.mb{margin-left:5px}
+.mb span{display:block;font-size:8px;letter-spacing:0;color:var(--muted);white-space:nowrap}
+.mb b{display:block;font-size:19px;font-weight:800;color:var(--text);line-height:1.15;white-space:nowrap}
+.mb small{display:block;font-size:10px;font-weight:600;color:var(--muted);line-height:1.2;white-space:nowrap}
+.nowp{display:flex;align-items:baseline}
+.nowp .p{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.nowp .u{font-size:12px;font-weight:400;color:var(--muted);margin-left:6px}
+.nowp .tag{margin-left:10px;font-size:12px;padding:2px 9px;border-radius:999px;background:var(--bg);font-weight:600}
+.planes .pr{display:flex;align-items:center;padding:5px 0}
+.planes .pr+.pr{border-top:1px solid var(--line)}
+.pf{width:42%;min-width:0;padding-right:10px}
+.pc{flex:1;min-width:0}
+.pf b{display:block;font-size:17px;line-height:1.2}
+.pc b{display:block;font-size:19px;line-height:1.2}
+.pf span,.pc span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .col{margin-top:14px}
 .col>*+*{margin-top:14px}
 .now{margin-bottom:10px}
@@ -121,8 +150,9 @@ input[type=text],input[type=date],input[type=time]{width:100%;background:var(--b
   section{padding:14px 18px;min-height:0}
   section.pricebox{flex:1;display:flex;flex-direction:column}
   #price{flex:1;display:flex;flex-direction:column;min-height:0}
-  .now .p{font-size:52px}
-  .bars{flex:1;height:auto;min-height:60px}
+  .now .p{font-size:44px}
+  .planes{flex:none;width:60%}
+  .bars{flex:1;height:auto;min-height:40px}
   section.cal{flex:1;overflow-y:auto}
   .agenda{font-size:calc(18px*var(--cs,1))}
   h2{font-size:16px}
@@ -154,9 +184,10 @@ window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reas
 <div class="col" id="colL">
   <section class="weather" id="weather" aria-label="Väder"></section>
   <section class="pricebox" aria-labelledby="elh">
-    <h2 id="elh"><span>Elpris SE3</span><span style="font-weight:400;font-size:13px">öre/kWh</span></h2>
+    <h2 id="elh"><span>Elpris SE3</span><span id="nowp" class="nowp"></span></h2>
     <div id="price"></div>
   </section>
+  <section class="planes" id="planes" aria-label="Flyg"></section>
 </div>
 
 <div class="col" id="colR">
@@ -180,6 +211,17 @@ window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reas
 
   <label for="city">Ort för väder</label>
   <input type="text" id="city" placeholder="Stockholm">
+
+  <label for="flLat">Flyg: position (latitud, longitud) och radie</label>
+  <div class="row" style="margin-top:0">
+    <input type="text" id="flLat" inputmode="decimal" placeholder="59.65" style="width:30%">
+    <input type="text" id="flLon" inputmode="decimal" placeholder="17.92" style="width:30%">
+    <input type="text" id="flRad" inputmode="decimal" placeholder="20" style="width:22%"><span>km</span>
+  </div>
+  <p class="hint">Lämna position tom för att använda väderorten. Exempel Arlanda: 59.65 och 17.92.</p>
+
+  <label for="proxy">Proxy-adress för flygdata (valfri)</label>
+  <input type="text" id="proxy" placeholder="https://flygproxy.dittnamn.workers.dev">
 
   <label for="clientId">Google Client ID</label>
   <input type="text" id="clientId" placeholder="123456-abc.apps.googleusercontent.com">
@@ -231,6 +273,10 @@ const cfg = {
   lat:     store.get("lat", 59.3293),
   lon:     store.get("lon", 18.0686),
   geoFor:  store.get("geoFor", "Stockholm"),
+  flLat:   store.get("flLat", ""),
+  flLon:   store.get("flLon", ""),
+  flRad:   store.get("flRad", 20),
+  proxy:   store.get("proxy", ""),
   schedOn: store.get("schedOn", true),
   onFrom:  store.get("onFrom", "06:00"),
   onTo:    store.get("onTo", "23:00")
@@ -327,9 +373,10 @@ async function renderPrices(){
   const hr = new Date().getHours();
   const c = series[hr];
   let head = "";
+  $("nowp").innerHTML = "";
   if(c !== null){
     const label = c <= lo ? "Billigt" : c >= hi ? "Dyrt" : "Normalt";
-    head = `<div class="now"><span class="p" style="color:${col(c)}">${fmt(c)}</span><span class="u">öre/kWh just nu</span><span class="tag" style="color:${col(c)}">${label}</span></div>`;
+    $("nowp").innerHTML = `<span class="p" style="color:${col(c)}">${fmt(c)}</span><span class="u">öre/kWh</span><span class="tag" style="color:${col(c)}">${label}</span>`;
   }
   const bars = series.map((x,i) => x === null
     ? '<div class="b"><div class="bar" style="height:2px;opacity:.15"></div></div>'
@@ -482,7 +529,7 @@ $("count").onclick = openSettings;
 function openSettings(){
   $("cdLabel").value = cfg.cdLabel; $("cdDate").value = cfg.cdDate;
   $("clientId").value = cfg.clientId; $("calIds").value = cfg.calIds; $("vat").checked = cfg.vat;
-  $("city").value = cfg.city; $("schedOn").checked = cfg.schedOn; $("onFrom").value = cfg.onFrom; $("onTo").value = cfg.onTo;
+  $("city").value = cfg.city; $("flLat").value = cfg.flLat; $("flLon").value = cfg.flLon; $("flRad").value = cfg.flRad; $("proxy").value = cfg.proxy; $("schedOn").checked = cfg.schedOn; $("onFrom").value = cfg.onFrom; $("onTo").value = cfg.onTo;
   draftScale = cfg.calScale; showScale(); dlg.showModal();
 }
 let draftScale = cfg.calScale;
@@ -498,9 +545,133 @@ $("save").onclick = () => {
   cfg.clientId = $("clientId").value.trim(); cfg.calIds = $("calIds").value.trim(); tokenClient = null; cfg.vat = $("vat").checked; cfg.calScale = draftScale;
   cfg.schedOn = $("schedOn").checked; cfg.onFrom = $("onFrom").value || "06:00"; cfg.onTo = $("onTo").value || "23:00";
   cfg.city = $("city").value.trim() || "Stockholm";
+  cfg.flLat = $("flLat").value.trim().replace(",", "."); cfg.flLon = $("flLon").value.trim().replace(",", ".");
+  cfg.flRad = parseFloat($("flRad").value.replace(",", ".")) || 20;
+  cfg.proxy = $("proxy").value.trim();
   Object.keys(cfg).forEach(k => store.set(k, cfg[k]));
-  dlg.close(); tick(); renderPrices(); renderCalendar(); applySchedule(); geocode().then(renderWeather);
+  dlg.close(); tick(); renderPrices(); renderCalendar(); applySchedule(); geocode().then(renderWeather); renderPlanes();
 };
+
+/* ---------- Flyg (adsb.fi/adsb.lol för position, adsbdb + hexdb för rutt) ---------- */
+const routeCache = {};
+let routeErr = false, planesBusy = false;
+const tx = x => esc(String(x == null ? "" : x));
+const norm = x => String(x || "").replace(/\s+/g, "").toUpperCase();
+function viaProxy(u){
+  const p = (cfg.proxy || "").trim().replace(/\/+$/, "");
+  return p ? p + "/?url=" + encodeURIComponent(u) : u;
+}
+function planePos(){
+  const la = parseFloat(cfg.flLat), lo = parseFloat(cfg.flLon), km = parseFloat(cfg.flRad) || 20;
+  return {lat: isNaN(la) ? cfg.lat : la, lon: isNaN(lo) ? cfg.lon : lo, km: km, nm: Math.max(3, Math.min(250, Math.ceil(km / 1.852)))};
+}
+function distKm(a, b, c, d){
+  const t = x => x * Math.PI / 180, dl = t(c - a), dn = t(d - b);
+  const q = Math.pow(Math.sin(dl/2), 2) + Math.cos(t(a)) * Math.cos(t(c)) * Math.pow(Math.sin(dn/2), 2);
+  return 2 * 6371.0088 * Math.asin(Math.sqrt(q));
+}
+async function getJSON(u){
+  const r = await fetch(viaProxy(u), {cache:"no-store"});
+  if(!r.ok) throw new Error(r.status);
+  return r.json();
+}
+async function fetchAircraft(q){
+  const la = q.lat.toFixed(6), lo = q.lon.toFixed(6);
+  const urls = [
+    `https://opendata.adsb.fi/api/v3/lat/${la}/lon/${lo}/dist/${q.nm}`,
+    `https://api.adsb.lol/v2/lat/${la}/lon/${lo}/dist/${q.nm}`,
+    `https://api.airplanes.live/v2/point/${la}/${lo}/${q.nm}`
+  ];
+  let last;
+  for(let i = 0; i < urls.length; i++){
+    try { const j = await getJSON(urls[i]); return j.ac || j.aircraft || []; } catch(e){ last = e; }
+  }
+  throw last;
+}
+async function routeFor(cs){
+  const c = routeCache[cs];
+  if(c && Date.now() < c.exp) return c.v;
+  const good = x => x.o.code && x.d.code && x.o.code !== x.d.code;
+  let v = null, failed = false;
+  try {
+    const r = await fetch(viaProxy("https://api.adsbdb.com/v0/callsign/" + encodeURIComponent(cs)), {cache:"no-store"});
+    if(r.ok){
+      const f = ((await r.json()).response || {}).flightroute;
+      if(f && norm(f.callsign_icao) === cs){
+        const o = f.origin || {}, d = f.destination || {};
+        const x = {fn: f.callsign_iata || cs, airline: (f.airline && f.airline.name) || "",
+          o: {code: o.iata_code || o.icao_code, city: o.municipality || o.name},
+          d: {code: d.iata_code || d.icao_code, city: d.municipality || d.name}};
+        if(good(x)) v = x;
+      }
+    } else if(r.status !== 404) failed = true;
+  } catch(e){ failed = true; }
+  if(!v){
+    try {
+      const r = await fetch(viaProxy("https://hexdb.io/api/v2/routes/" + encodeURIComponent(cs)), {cache:"no-store"});
+      if(r.ok){
+        const f = await r.json();
+        if(norm(f.callsign) === cs){
+          const o = f.origin || {}, d = f.destination || {};
+          const x = {fn: cs, airline: "",
+            o: {code: o.iata || o.icao, city: o.region || o.name},
+            d: {code: d.iata || d.icao, city: d.region || d.name}};
+          if(good(x)) v = x;
+        }
+      } else if(r.status !== 404) failed = true;
+    } catch(e){ failed = true; }
+  }
+  if(failed && !v) routeErr = true;
+  routeCache[cs] = {v: v, exp: Date.now() + (v ? 2*3600000 : failed ? 60000 : 10*60000)};
+  return v;
+}
+const PLANE_PTS = "15,1 17,1 19,12 29,16 29,19 19,17 18,25 22,28 22,30 16,28 10,30 10,28 14,25 13,17 3,19 3,16 13,12";
+const dirTxt = d => ["N","NÖ","Ö","SÖ","S","SV","V","NV"][Math.round((((d % 360) + 360) % 360) / 45) % 8];
+function planeCard(f){
+  const e = x => x ? tx(x) : "&nbsp;";
+  const m = (label, val, unit) => `<div class="mb"><span>${label}</span><b${val && String(val).length > 4 ? ' style="font-size:15px"' : ""}>${val ? tx(val) : "&nbsp;"}</b><small>${val && unit ? tx(unit) : "&nbsp;"}</small></div>`;
+  const o = f.o || {}, d = f.d || {};
+  return `<div class="fc"><div class="fh"><div class="fl"><b>${e(f.fn)}</b><span class="al">${e(f.airline)}</span></div>`
+    + `<svg class="fp" viewBox="0 0 32 32" aria-hidden="true" style="transform:rotate(${f.trk == null ? 0 : f.trk}deg);opacity:${f.none ? .2 : 1}"><polygon points="${PLANE_PTS}"/></svg></div>`
+    + `<div class="fr"><div class="fa"><b>${e(o.code)}</b><span>${e(o.city)}</span></div>`
+    + `<div class="ar" style="opacity:${o.code && d.code ? 1 : .2}">▶</div>`
+    + `<div class="fa"><b>${e(d.code)}</b><span>${e(d.city)}</span></div></div>`
+    + `<div class="fm">${m("AVSTÅND", f.dist, "KM")}${m("HÖJD", f.alt, "M")}${m("HASTIGHET", f.spd, "KM/H")}${m("KURS", f.deg, f.dir)}</div></div>`;
+}
+async function renderPlanes(){
+  if(planesBusy) return;
+  planesBusy = true;
+  const box = $("planes");
+  try {
+    if(cfg.schedOn && !isDay()) return;
+    if(!box.children.length) box.innerHTML = planeCard({airline:"Hämtar flyg…", none:true});
+    const q = planePos();
+    let ac;
+    try { ac = await fetchAircraft(q); }
+    catch(err){ box.innerHTML = planeCard({airline:"Kunde inte hämta flygdata (" + (err.message || err) + ")", none:true}); return; }
+    const list = ac
+      .filter(a => typeof a.lat === "number" && typeof a.lon === "number")
+      .map(a => ({a: a, d: distKm(q.lat, q.lon, a.lat, a.lon)}))
+      .filter(x => x.d <= q.km)
+      .sort((x, y) => x.d - y.d);
+    if(!list.length){ box.innerHTML = planeCard({airline:"Inga flygplan i närheten", none:true}); return; }
+    const a = list[0].a, cs = norm(a.flight), hex = norm(a.hex);
+    const r = cs && cs !== hex ? await routeFor(cs) : null;
+    const alt = typeof a.alt_baro === "number" ? a.alt_baro : (typeof a.alt_geom === "number" ? a.alt_geom : null);
+    const trk = typeof a.track === "number" ? a.track : null;
+    box.innerHTML = planeCard({
+      fn: (r && r.fn) || cs || norm(a.r) || hex,
+      airline: r ? r.airline : "",
+      o: r ? r.o : {}, d: r ? r.d : {},
+      dist: list[0].d.toFixed(1).replace(".", ","),
+      alt: alt == null ? "" : String(Math.round(alt * 0.3048)),
+      spd: typeof a.gs === "number" ? String(Math.round(a.gs * 1.852)) : "",
+      trk: trk,
+      deg: trk == null ? "" : Math.round(trk) + "°",
+      dir: trk == null ? "" : dirTxt(trk)
+    });
+  } finally { planesBusy = false; }
+}
 
 /* ---------- Skärmschema (wake lock + svart natt-läge) ---------- */
 let wl = null, peekUntil = 0;
@@ -525,7 +696,7 @@ function applySchedule(){
   setWake(day);
 }
 $("night").onclick = () => { peekUntil = Date.now() + 60000; applySchedule(); };
-function refreshAll(){ renderPrices(); renderWeather(); renderCalendar(); }
+function refreshAll(){ renderPrices(); renderWeather(); renderCalendar(); renderPlanes(); }
 document.addEventListener("visibilitychange", () => { applySchedule(); if(document.visibilityState === "visible") refreshAll(); });
 window.addEventListener("online", refreshAll);
 
@@ -542,6 +713,7 @@ tick(); setInterval(tick, 15000);
 renderPrices(); renderWeather(); renderCalendar();
 setInterval(renderPrices, 15*60*1000);
 setInterval(renderWeather, 30*60*1000);
+renderPlanes(); setInterval(renderPlanes, 20000);
 setInterval(renderCalendar, 5*60*1000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
