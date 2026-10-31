@@ -76,6 +76,12 @@ h2{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:10px;display:
 .ev .t{width:6.4em;flex:none;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.9em}
 .ev .w{font-weight:600}
 .ev .w small{display:block;font-weight:400;color:var(--muted);font-size:.8em}
+.cb{flex:none;width:.28em;border-radius:2px;background:var(--line);align-self:stretch}
+.later{margin-top:1.1em;padding-top:.8em;border-top:1px solid var(--line);font-size:.78em}
+.lv{display:flex;align-items:center;padding:.22em 0}
+.ld{width:6.8em;flex:none;color:var(--muted);white-space:nowrap}
+.lv .cb{margin-right:.7em}
+.lt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .day.today h3{font-size:1.2em}
 .day.today .ev{font-size:1.35em}
 .signin.small{padding:6px 12px;font-size:13px;margin:0 0 10px}
@@ -512,47 +518,72 @@ async function renderCalendar(){
     } else if(!tokenValid()) signInBtn("Logga in för att se din kalender.");
   }
 }
+const GAPI = "https://www.googleapis.com/calendar/v3/";
+let calColors = null, calColorsT = 0;
+const calMeta = {};
+async function gget(u){
+  const r = await fetch(u, {headers:{Authorization:"Bearer " + token.v}});
+  if(r.status === 401){ token = null; store.set("gtoken", null); throw "auth"; }
+  if(!r.ok) throw new Error(r.status);
+  return r.json();
+}
+async function loadColors(ids){
+  if(!calColors || Date.now() - calColorsT > 12*3600000){
+    try { calColors = (await gget(GAPI + "colors")).event || {}; calColorsT = Date.now(); }
+    catch(e){ if(e === "auth") throw e; calColors = calColors || {}; }
+  }
+  for(let i = 0; i < ids.length; i++){
+    const id = ids[i];
+    if(!calMeta[id] || Date.now() - calMeta[id].t > 12*3600000){
+      try { const m = await gget(GAPI + "users/me/calendarList/" + encodeURIComponent(id)); calMeta[id] = {t: Date.now(), color: m.backgroundColor || ""}; }
+      catch(e){ if(e === "auth") throw e; calMeta[id] = {t: Date.now(), color: ""}; }
+    }
+  }
+}
 async function loadEvents(){
   if(!hasAgenda()) calMsg('<p class="msg">Hämtar händelser…</p>');
   const ids = cfg.calIds.split(",").map(x => x.trim()).filter(Boolean);
   const from = new Date(); from.setHours(0,0,0,0);
-  const to = new Date(from); to.setDate(to.getDate() + 7);
+  const to = new Date(from); to.setDate(to.getDate() + 14);
   try {
+    await loadColors(ids);
     const lists = await Promise.all(ids.map(async id => {
-      const u = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(id)}/events?singleEvents=true&orderBy=startTime&maxResults=50&timeMin=${from.toISOString()}&timeMax=${to.toISOString()}`;
-      const r = await fetch(u, {headers:{Authorization:"Bearer " + token.v}});
-      if(r.status === 401){ token = null; store.set("gtoken", null); throw "auth"; }
-      if(!r.ok) throw new Error(id + ": " + r.status);
-      return (await r.json()).items || [];
+      const u = `${GAPI}calendars/${encodeURIComponent(id)}/events?singleEvents=true&orderBy=startTime&maxResults=150&timeMin=${from.toISOString()}&timeMax=${to.toISOString()}`;
+      const j = await gget(u);
+      const base = (calMeta[id] && calMeta[id].color) || "";
+      return (j.items || []).map(e => { e._c = (e.colorId && calColors[e.colorId] && calColors[e.colorId].background) || base; return e; });
     }));
     $("calstatus").innerHTML = "";
     const evs = lists.reduce((a,b) => a.concat(b), []).map(e => {
       const allDay = !!e.start.date;
       const st = allDay ? new Date(e.start.date + "T00:00:00") : new Date(e.start.dateTime);
       const en = allDay ? new Date(e.end.date + "T00:00:00") : new Date(e.end.dateTime);
-      return {t:e.summary || "(utan titel)", loc:e.location || "", allDay, st, en};
+      return {t: e.summary || "(utan titel)", loc: e.location || "", allDay: allDay, st: st, en: en, c: e._c || ""};
     });
-    // dela upp heldagshändelser som sträcker sig över flera dagar
-    const byDay = {};
-    for(let i = 0; i < 7; i++){
+    const days = [];
+    for(let i = 0; i < 14; i++){
       const d0 = new Date(from); d0.setDate(d0.getDate() + i);
       const d1 = new Date(d0); d1.setDate(d1.getDate() + 1);
-      const list = evs.filter(e => e.st < d1 && e.en > d0 && !(e.en <= d0))
-        .sort((a,b) => (b.allDay - a.allDay) || (a.st - b.st));
-      if(list.length) byDay[i] = {d0, list};
+      const list = evs.filter(e => e.st < d1 && e.en > d0).sort((a,b) => (b.allDay - a.allDay) || (a.st - b.st));
+      if(list.length) days.push({i: i, d0: d0, list: list});
     }
-    const keys = Object.keys(byDay);
-    if(!keys.length){ calMsg('<p class="msg">Inga händelser de närmaste 7 dagarna.</p>'); return; }
+    if(!days.length){ calMsg('<p class="msg">Inga händelser de närmaste 14 dagarna.</p>'); return; }
     const hm = d => d.toLocaleTimeString("sv-SE", {hour:"2-digit", minute:"2-digit"});
-    calMsg('<div class="agenda">' + keys.map(k => {
-      const {d0, list} = byDay[k];
-      const title = k === "0" ? "Idag" : k === "1" ? "Imorgon" : d0.toLocaleDateString("sv-SE", {weekday:"long", day:"numeric", month:"long"});
-      return `<div class="day${k === "0" ? " today" : ""}"><h3>${title}</h3>` + list.map(e =>
-        `<div class="ev"><span class="t">${e.allDay ? "Heldag" : hm(e.st) + "–" + hm(e.en)}</span><span class="w">${esc(e.t)}${e.loc ? "<small>" + esc(e.loc) + "</small>" : ""}</span></div>`
+    const bar = c => `<i class="cb"${c ? ` style="background:${esc(c)}"` : ""}></i>`;
+    let html = days.filter(x => x.i < 7).map(x => {
+      const title = x.i === 0 ? "Idag" : x.i === 1 ? "Imorgon" : x.d0.toLocaleDateString("sv-SE", {weekday:"long", day:"numeric", month:"long"});
+      return `<div class="day${x.i === 0 ? " today" : ""}"><h3>${title}</h3>` + x.list.map(e =>
+        `<div class="ev">${bar(e.c)}<span class="t">${e.allDay ? "Heldag" : hm(e.st) + "–" + hm(e.en)}</span><span class="w">${esc(e.t)}${e.loc ? "<small>" + esc(e.loc) + "</small>" : ""}</span></div>`
       ).join("") + "</div>";
-    }).join("") + "</div>");
+    }).join("");
+    const later = days.filter(x => x.i >= 7);
+    if(later.length) html += '<div class="later">' + later.map(x => {
+      const dl = x.d0.toLocaleDateString("sv-SE", {weekday:"short", day:"numeric", month:"short"});
+      return x.list.map((e, j) => `<div class="lv"><span class="ld">${j === 0 ? esc(dl) : "&nbsp;"}</span>${bar(e.c)}<span class="lt">${esc(e.t)}</span></div>`).join("");
+    }).join("") + "</div>";
+    calMsg('<div class="agenda">' + html + '</div>');
   } catch(err){
-    if(err === "auth") { renderCalendar(); return; }
+    if(err === "auth"){ renderCalendar(); return; }
     if(hasAgenda()){ $("calstatus").innerHTML = '<p class="msg">Kunde inte uppdatera kalendern just nu.</p>'; return; }
     calMsg(`<p class="msg">Kunde inte hämta kalendern (${esc(String(err.message || err))}). Kontrollera kalender-ID och att Google Calendar API är aktiverat i ditt Cloud-projekt.</p>`);
   }
