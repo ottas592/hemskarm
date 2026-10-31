@@ -19,7 +19,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font)}
 body{padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));max-width:560px;margin:0 auto}
 button,input{font:inherit;color:inherit}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.weekday{font-size:15px;color:var(--muted);font-weight:400}
+.dl{display:flex;flex-wrap:wrap;align-items:baseline}
+.dl>*+*{margin-left:16px}
+.wk{font-size:15px;color:var(--muted);font-weight:400}
 .date{font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
 .clock{font-size:40px;font-weight:300;font-variant-numeric:tabular-nums;text-align:right;line-height:1.05}
 .week{font-size:13px;color:var(--muted);text-align:right}
@@ -140,9 +142,8 @@ input[type=text],input[type=date],input[type=time]{width:100%;background:var(--b
     grid-template-columns:1fr 1.1fr;grid-template-rows:auto 1fr;
     grid-template-areas:"top top" "L R";grid-gap:14px 18px;padding:14px 28px}
   .top{grid-area:top;align-items:center}
-  .weekday{font-size:26px}
+  .wk{font-size:24px}
   .date,.clock{font-size:7.4vw}
-  .week{font-size:22px}
   .col{margin:0;display:flex;flex-direction:column;min-height:0}
   #colL{grid-area:L}
   #colR{grid-area:R}
@@ -170,14 +171,11 @@ window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reas
 </script>
 
 <header class="top">
-  <div>
-    <div class="weekday" id="weekday"></div>
+  <div class="dl">
     <div class="date" id="date"></div>
+    <div class="wk"><span id="weekday"></span> · <span id="week"></span></div>
   </div>
-  <div>
-    <div class="clock" id="clock"></div>
-    <div class="week" id="week"></div>
-  </div>
+  <div class="clock" id="clock"></div>
   <div class="tools"><button class="gear" id="fs" type="button" aria-label="Fullskärm" hidden>⛶&#xFE0E;</button><button class="gear" id="openSettings" type="button" aria-label="Inställningar"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button></div>
 </header>
 
