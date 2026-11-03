@@ -56,13 +56,15 @@ h2{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:10px;display:
 .chart{margin-top:12px}
 .dh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;color:var(--muted);margin-bottom:5px}
 .dh b{color:var(--text);font-size:15px}
-.bars{position:relative;display:flex;height:80px}
-.b{flex:1;display:flex;align-items:flex-end;padding:0 1px}
+.bars{position:relative;display:flex;height:80px;margin-left:30px}
+.b{flex:1;display:flex;align-items:flex-end;padding:0 1px;position:relative;z-index:1}
 .bar{width:100%;border-radius:2px 2px 0 0;min-height:2px;opacity:.9}
 .bar.past{opacity:.4}
-.nowline{position:absolute;top:-5px;bottom:0;width:3px;margin-left:-1.5px;background:var(--text);border-radius:2px;box-shadow:0 0 0 1.5px var(--bg);pointer-events:none}
+.gl{position:absolute;left:0;right:0;height:0;border-top:1px solid var(--line);opacity:.6;z-index:0}
+.yl{position:absolute;left:-32px;width:28px;text-align:right;font-size:11px;line-height:1;color:var(--muted);transform:translateY(50%)}
+.nowline{z-index:2;position:absolute;top:-5px;bottom:0;width:3px;margin-left:-1.5px;background:var(--text);border-radius:2px;box-shadow:0 0 0 1.5px var(--bg);pointer-events:none}
 .nowline::before{content:"";position:absolute;top:-2px;left:-3px;width:9px;height:9px;border-radius:50%;background:var(--text);box-shadow:0 0 0 1.5px var(--bg)}
-.axis{position:relative;height:18px;margin-top:6px}
+.axis{position:relative;height:18px;margin-top:6px;margin-left:30px}
 .axis span{position:absolute;top:0;font-size:12px;color:var(--muted)}
 .axis b{color:var(--text);font-weight:600}
 .midnight{position:absolute;top:0;bottom:0;left:50%;border-left:1px dashed var(--line);pointer-events:none}
@@ -131,6 +133,13 @@ input[type=text],input[type=date],input[type=time]{width:100%;background:var(--b
 .dot{width:10px;height:10px;border-radius:50%;margin-right:8px;flex:none;display:inline-block}
 .ar svg{display:block;margin:0 auto}
 #carRaw{max-height:150px;overflow:auto;font-size:11px;background:var(--bg);padding:8px;border-radius:8px;white-space:pre-wrap;margin-top:8px}
+.hl{display:flex;align-items:baseline;min-width:0}
+.hl .nowp{margin-left:14px}
+.live{display:flex;align-items:baseline;white-space:nowrap;margin-left:10px}
+.live .ll{font-size:13px;font-weight:400;color:var(--muted);margin-right:6px}
+.live b{font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.live b.old{color:var(--muted)}
+.live small{font-size:11px;font-weight:400;color:var(--muted);margin-left:6px}
 .nowp{display:flex;align-items:baseline}
 .nowp .p{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
 .nowp .u{font-size:12px;font-weight:400;color:var(--muted);margin-left:6px}
@@ -208,7 +217,7 @@ window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reas
 <div class="col" id="colL">
   <section class="weather" id="weather" aria-label="Väder"></section>
   <section class="pricebox" aria-labelledby="elh">
-    <h2 id="elh"><span>Elpris SE3</span><span id="nowp" class="nowp"></span></h2>
+    <h2 id="elh"><div class="hl"><span>Elpris SE3</span><span id="nowp" class="nowp"></span></div><span id="live" class="live"></span></h2>
     <div id="price"></div>
   </section>
   <div class="brow">
@@ -248,14 +257,19 @@ window.addEventListener("unhandledrejection",function(ev){showErr(String(ev.reas
   <p class="hint">Lämna position tom för att använda väderorten. Exempel Arlanda: 59.65 och 17.92.</p>
 
   <label for="proxy">Proxy-adress för flygdata (valfri)</label>
-  <input type="text" id="proxy" placeholder="https://flygproxy.dittnamn.workers.dev">
+  <input type="text" id="proxy" placeholder="https://flygproxy.dittnamn.workers.dev" autocapitalize="off" autocorrect="off" spellcheck="false">
 
   <label for="vin">Bil: VIN-nummer (Škoda Enyaq)</label>
   <input type="text" id="vin" placeholder="17 tecken" autocapitalize="characters" autocomplete="off">
   <label for="ptoken">Bil: proxy-lösenord</label>
-  <input type="text" id="ptoken" autocomplete="off">
+  <input type="text" id="ptoken" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
   <label for="carMin">Bil: uppdatera högst var … minut (minst 10)</label>
   <input type="text" id="carMin" inputmode="numeric" placeholder="30">
+
+  <label for="tToken">Tibber: åtkomsttoken</label>
+  <input type="password" id="tToken" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+  <label for="tHome">Tibber: hem-ID</label>
+  <input type="text" id="tHome" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
   <div class="row"><button class="btn" id="carDebug" type="button">Visa bilens rådata</button></div>
   <pre id="carRaw" hidden></pre>
 
@@ -316,6 +330,8 @@ const cfg = {
   vin:     store.get("vin", ""),
   proxyToken: store.get("proxyToken", ""),
   carMin:  store.get("carMin", 30),
+  tToken:  store.get("tToken", ""),
+  tHome:   store.get("tHome", ""),
   schedOn: store.get("schedOn", true),
   onFrom:  store.get("onFrom", "06:00"),
   onTo:    store.get("onTo", "23:00")
@@ -341,6 +357,7 @@ function tick(){
   if(now.getHours() !== lastHr){ lastHr = now.getHours(); renderPrices(); renderWeather(); }
   applySchedule();
   const dayNow = !cfg.schedOn || isDay();
+  if(dayNow !== wasDay) tibberSync();
   if(dayNow && !wasDay) refreshAll();
   wasDay = dayNow;
   const mins = now.getHours()*60 + now.getMinutes();
@@ -417,15 +434,24 @@ async function renderPrices(){
   let head = "";
   $("nowp").innerHTML = "";
   if(c !== null){
-    const label = c <= lo ? "Billigt" : c >= hi ? "Dyrt" : "Normalt";
-    $("nowp").innerHTML = `<span class="p" style="color:${col(c)}">${fmt(c)}</span><span class="u">öre/kWh</span><span class="tag" style="color:${col(c)}">${label}</span>`;
+    $("nowp").innerHTML = `<span class="p" style="color:${col(c)}">${fmt(c)}</span><span class="u">öre/kWh</span>`;
   }
   const bars = series.map((x,i) => x === null
     ? '<div class="b"><div class="bar" style="height:2px;opacity:.15"></div></div>'
     : `<div class="b" title="${i < 24 ? "Idag" : "Imorgon"} ${hh(i % 24)}:00 – ${fmt(x)} öre"><div class="bar${i < hr ? " past" : ""}" style="height:${Math.max(3, x/gmax*100)}%;background:${col(x)}"></div></div>`).join("");
   const labels = [0,6,12,18,24,30,36,42].map(i =>
     `<span style="left:${i/48*100}%">${i === 0 ? "<b>Idag</b>" : i === 24 ? "<b>Imorgon</b>" : hh(i % 24)}</span>`).join("");
-  box.innerHTML = head + `<div class="bars">${bars}<div class="midnight"></div><div class="nowline" style="left:${nowPct()}%"></div></div><div class="axis">${labels}</div>`;
+  let grid = "";
+  if(gmax > 0){
+    const ts = [10, 20, 25, 50, 100, 200, 250, 500, 1000];
+    let step = 1000;
+    for(let i = 0; i < ts.length; i++){ if(gmax / ts[i] <= 4){ step = ts[i]; break; } }
+    for(let v = 0; v <= gmax; v += step){
+      const b = (v / gmax * 100).toFixed(2);
+      grid += `<div class="gl" style="bottom:${b}%"></div><span class="yl" style="bottom:${b}%">${fmt(v)}</span>`;
+    }
+  }
+  box.innerHTML = head + `<div class="bars">${grid}${bars}<div class="midnight"></div><div class="nowline" style="left:${nowPct()}%"></div></div><div class="axis">${labels}</div>`;
 }
 
 /* ---------- Väder (Open-Meteo, ingen nyckel behövs) ---------- */
@@ -596,7 +622,7 @@ $("count").onclick = openSettings;
 function openSettings(){
   $("cdLabel").value = cfg.cdLabel; $("cdDate").value = cfg.cdDate;
   $("clientId").value = cfg.clientId; $("calIds").value = cfg.calIds; $("vat").checked = cfg.vat;
-  $("city").value = cfg.city; $("flLat").value = cfg.flLat; $("flLon").value = cfg.flLon; $("flRad").value = cfg.flRad; $("proxy").value = cfg.proxy; $("vin").value = cfg.vin; $("ptoken").value = cfg.proxyToken; $("carMin").value = cfg.carMin; $("carRaw").hidden = true; $("schedOn").checked = cfg.schedOn; $("onFrom").value = cfg.onFrom; $("onTo").value = cfg.onTo;
+  $("city").value = cfg.city; $("flLat").value = cfg.flLat; $("flLon").value = cfg.flLon; $("flRad").value = cfg.flRad; $("proxy").value = cfg.proxy; $("vin").value = cfg.vin; $("ptoken").value = cfg.proxyToken; $("carMin").value = cfg.carMin; $("tToken").value = cfg.tToken; $("tHome").value = cfg.tHome; $("carRaw").hidden = true; $("schedOn").checked = cfg.schedOn; $("onFrom").value = cfg.onFrom; $("onTo").value = cfg.onTo;
   draftScale = cfg.calScale; showScale(); dlg.showModal();
 }
 let draftScale = cfg.calScale;
@@ -630,13 +656,15 @@ $("save").onclick = () => {
   cfg.flRad = parseFloat($("flRad").value.replace(",", ".")) || 20;
   cfg.proxy = $("proxy").value.trim();
   cfg.vin = $("vin").value.replace(/\s+/g, "").toUpperCase(); cfg.proxyToken = $("ptoken").value.trim(); cfg.carMin = Math.max(10, parseInt($("carMin").value, 10) || 30);
+  cfg.tToken = $("tToken").value.trim(); cfg.tHome = $("tHome").value.trim();
   Object.keys(cfg).forEach(k => store.set(k, cfg[k]));
   dlg.close(); tick(); renderPrices(); renderCalendar(); applySchedule(); geocode().then(renderWeather); renderPlanes(); renderCar(true);
+  tFail = ""; tibberStop(); tBackoff = 2000; tibberSync();
 };
 
 /* ---------- Flyg (adsb.fi/adsb.lol för position, adsbdb + hexdb för rutt) ---------- */
 const routeCache = {};
-let routeErr = false, planesBusy = false;
+let routeErr = false, planesBusy = false, planeProv = 0, planeFails = 0;
 const tx = x => esc(String(x == null ? "" : x));
 const norm = x => String(x || "").replace(/\s+/g, "").toUpperCase();
 function viaProxy(u, tok){
@@ -653,9 +681,13 @@ function distKm(a, b, c, d){
   return 2 * 6371.0088 * Math.asin(Math.sqrt(q));
 }
 async function getJSON(u){
-  const r = await fetch(viaProxy(u), {cache:"no-store"});
-  if(!r.ok) throw new Error(r.status);
-  return r.json();
+  const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+  const tm = ctl ? setTimeout(() => ctl.abort(), 6000) : 0;
+  try {
+    const r = await fetch(viaProxy(u), ctl ? {cache:"no-store", signal: ctl.signal} : {cache:"no-store"});
+    if(!r.ok) throw new Error(r.status);
+    return await r.json();
+  } finally { if(tm) clearTimeout(tm); }
 }
 async function fetchAircraft(q){
   const la = q.lat.toFixed(6), lo = q.lon.toFixed(6);
@@ -665,8 +697,12 @@ async function fetchAircraft(q){
     `https://api.airplanes.live/v2/point/${la}/${lo}/${q.nm}`
   ];
   let last;
-  for(let i = 0; i < urls.length; i++){
-    try { const j = await getJSON(urls[i]); return j.ac || j.aircraft || []; } catch(e){ last = e; }
+  for(let round = 0; round < 2; round++){
+    for(let k = 0; k < urls.length; k++){
+      const i = (planeProv + k) % urls.length;
+      try { const j = await getJSON(urls[i]); planeProv = i; return j.ac || j.aircraft || []; } catch(e){ last = e; }
+    }
+    if(round === 0) await new Promise(res => setTimeout(res, 1500));
   }
   throw last;
 }
@@ -703,8 +739,9 @@ async function routeFor(cs){
       } else if(r.status !== 404) failed = true;
     } catch(e){ failed = true; }
   }
+  if(failed && !v && c && c.v) v = c.v;
   if(failed && !v) routeErr = true;
-  routeCache[cs] = {v: v, exp: Date.now() + (v ? 2*3600000 : failed ? 60000 : 10*60000)};
+  routeCache[cs] = {v: v, exp: Date.now() + (failed ? 60000 : v ? 2*3600000 : 10*60000)};
   return v;
 }
 const PLANE_PTS = "15,1 17,1 19,12 29,16 29,19 19,17 18,25 22,28 22,30 16,28 10,30 10,28 14,25 13,17 3,19 3,16 13,12";
@@ -730,7 +767,13 @@ async function renderPlanes(){
     const q = planePos();
     let ac;
     try { ac = await fetchAircraft(q); }
-    catch(err){ box.innerHTML = planeCard({airline:"Kunde inte hämta flygdata (" + (err.message || err) + ")", none:true}); return; }
+    catch(err){
+      planeFails++;
+      if(planeFails < 3 && box.dataset.ok === "1") return;
+      box.innerHTML = planeCard({airline:"Kunde inte hämta flygdata (" + (err.message || err) + ")", none:true});
+      return;
+    }
+    planeFails = 0; box.dataset.ok = "1";
     const list = ac
       .filter(a => typeof a.lat === "number" && typeof a.lon === "number")
       .map(a => ({a: a, d: distKm(q.lat, q.lon, a.lat, a.lon)}))
@@ -818,7 +861,13 @@ async function renderCar(force){
     const u = "https://public.api.connect.skoda-auto.cz/api/v1/vehicles/" + encodeURIComponent(cfg.vin.trim());
     const r = await fetch(viaProxy(u, true), {cache:"no-store"});
     if(r.status === 429){ carBackoff = Date.now() + (parseInt(r.headers.get("Retry-After"), 10) || 600) * 1000; throw new Error("för många anrop"); }
-    if(!r.ok) throw new Error("HTTP " + r.status);
+    if(!r.ok){
+      const t = await r.text().catch(() => "");
+      let why = "";
+      if(r.status === 403 && /^Not allowed/.test(t)) why = "proxy-lösenord eller VIN";
+      else { try { const o = JSON.parse(t); why = String(o.type || "").split("/").pop() || o.title || ""; } catch(x){} }
+      throw new Error("HTTP " + r.status + (why ? " " + why : ""));
+    }
     const j = await r.json();
     lastCar = carInfo(j.vehicle || j);
     lastCar.fetched = Date.now();
@@ -828,6 +877,64 @@ async function renderCar(force){
   } catch(err){
     box.innerHTML = carHtml(Object.assign({}, lastCar, {note: "fel: " + (err.message || err)}));
   }
+}
+
+/* ---------- Tibber Pulse (liveMeasurement via WebSocket, direkt från plattan) ---------- */
+let tws = null, tTimer = 0, tLast = null, tBackoff = 2000, tFail = "";
+const tibberOn = () => !!((cfg.tToken || "").trim() && (cfg.tHome || "").trim()) && !(cfg.schedOn && !isDay());
+function showLive(){
+  const el = $("live");
+  if(!(cfg.tToken || "").trim() || !(cfg.tHome || "").trim()){ el.innerHTML = ""; return; }
+  if(tFail){ el.innerHTML = `<span class="ll">Tibber:</span><b class="old" style="font-size:15px">${tx(tFail)}</b>`; return; }
+  const age = tLast ? (Date.now() - tLast.at) / 1000 : 1e9;
+  if(age > 600){ el.innerHTML = '<span class="ll">Just nu:</span><b class="old">…</b>'; return; }
+  const w = tLast.power, old = age > 90;
+  const t = w >= 1000 ? (w / 1000).toFixed(1).replace(".", ",") + " kW" : Math.round(w) + " W";
+  el.innerHTML = `<span class="ll">Just nu:</span><b${old ? ' class="old"' : ""}>${t}</b>` + (old ? `<small>${Math.max(1, Math.round(age / 60))} min sen</small>` : "");
+}
+function tibberRetry(){
+  clearTimeout(tTimer);
+  if(!tibberOn() || tFail) return;
+  tTimer = setTimeout(tibberConnect, tBackoff);
+  tBackoff = Math.min(60000, tBackoff * 2);
+}
+function tibberConnect(){
+  if(tws || tFail || !tibberOn() || !("WebSocket" in window)) return;
+  let ws;
+  try { ws = new WebSocket("wss://websocket-api.tibber.com/v1-beta/gql/subscriptions", "graphql-transport-ws"); }
+  catch(e){ tibberRetry(); return; }
+  tws = ws;
+  ws.onopen = () => ws.send(JSON.stringify({type: "connection_init", payload: {token: cfg.tToken.trim()}}));
+  ws.onmessage = ev => {
+    let m;
+    try { m = JSON.parse(ev.data); } catch(e){ return; }
+    if(m.type === "connection_ack"){
+      tBackoff = 2000;
+      ws.send(JSON.stringify({id: "1", type: "subscribe", payload: {query: 'subscription{liveMeasurement(homeId:"' + cfg.tHome.trim().replace(/"/g, "") + '"){timestamp power}}'}}));
+    } else if(m.type === "next"){
+      const lm = m.payload && m.payload.data && m.payload.data.liveMeasurement;
+      if(lm && typeof lm.power === "number"){ tLast = {power: lm.power, at: Date.now()}; showLive(); }
+    } else if(m.type === "ping"){
+      ws.send(JSON.stringify({type: "pong"}));
+    } else if(m.type === "error"){
+      tFail = "fel i förfrågan"; showLive();
+    }
+  };
+  ws.onclose = ev => {
+    if(tws !== ws) return;
+    tws = null;
+    if(ev.code >= 4400 && ev.code < 4500){ tFail = "fel " + ev.code + " (token/hem-ID?)"; showLive(); return; }
+    tibberRetry();
+  };
+  ws.onerror = () => { try { ws.close(); } catch(e){} };
+}
+function tibberStop(){
+  clearTimeout(tTimer);
+  if(tws){ const w = tws; tws = null; try { w.close(); } catch(e){} }
+}
+function tibberSync(){
+  if(tibberOn()) tibberConnect(); else tibberStop();
+  showLive();
 }
 
 /* ---------- Skärmschema (wake lock + svart natt-läge) ---------- */
@@ -853,7 +960,7 @@ function applySchedule(){
   setWake(day);
 }
 $("night").onclick = () => { peekUntil = Date.now() + 60000; applySchedule(); };
-function refreshAll(){ renderPrices(); renderWeather(); renderCalendar(); renderPlanes(); renderCar(); }
+function refreshAll(){ renderPrices(); renderWeather(); renderCalendar(); renderPlanes(); renderCar(); tibberSync(); }
 document.addEventListener("visibilitychange", () => { applySchedule(); if(document.visibilityState === "visible") refreshAll(); });
 window.addEventListener("online", refreshAll);
 
@@ -872,6 +979,7 @@ setInterval(renderPrices, 15*60*1000);
 setInterval(renderWeather, 30*60*1000);
 renderPlanes(); setInterval(renderPlanes, 20000);
 renderCar(); setInterval(renderCar, 60*1000);
+tibberSync(); setInterval(showLive, 15000);
 setInterval(renderCalendar, 5*60*1000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
